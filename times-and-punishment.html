@@ -621,39 +621,55 @@ const SPEAKERS = {
   narr: { name:'', sprite:null, pitch:240 },
 };
 
+// Each act's "t" can be a list: first time you use it, then repeats.
+// "warm" lines show up once a monster is halfway to being spared.
+// "spareTalk" is the little goodbye scene when you SPARE it.
 const ENEMIES = {
   binarat: { name:'BINARAT', emoji:'🐀', focus:[0,1,10], pitch:600,
     desc:'Only knows 1 and 0. Thinks that is plenty.',
     intro:'* BINARAT scurries in! 01001000 01001001!',
     pre:[{w:'remy',t:'First monster. A Binarat. Easy one. Quick lesson:'},
-         {w:'remy',t:'FIGHT = multiplication. Type the answer. Faster answers hit HARDER.'},
-         {w:'remy',t:'ACT = division. Get it right and the monster starts to like you. Fill the MERCY bar, then SPARE it.'},
+         {w:'remy',t:'FIGHT and ACT both ask math facts. Times AND divide. Type the answer on the keypad.'},
+         {w:'remy',t:'FIGHT: faster answers hit HARDER.'},
+         {w:'remy',t:'ACT: do something nice, then answer to make it land. Fill the MERCY bar and you can SPARE them.'},
+         {w:'null',t:'Honestly? ACT is where the good stuff is. Monsters say the WEIRDEST things.'},
          {w:'null',t:'When it attacks, tap the RIGHT answer before it hits the floor! Or get bonked. Educationally.'},
          {w:'remy',t:'SNACK heals you. And if you miss a fact, I will show you a trick for it. Ready?'}],
-    acts:[{n:'Count in binary',t:'* You count to ten in binary: “1, 10, 11, 100...” Binarat sheds a single tear.'},
-          {n:'Offer cheese',t:'* You offer cheese. Binarat checks if it is 1 cheese or 0 cheese. It is 1. Joy.'}],
+    acts:[{n:'Count in binary',t:['* You count to ten in binary: “1, 10, 11, 100...” Binarat sheds a single tear.','* You count again. Binarat mouths along. 1... 10... 11... It is learning.']},
+          {n:'Offer cheese',t:['* You offer cheese. Binarat checks if it is 1 cheese or 0 cheese. It is 1. Joy.','* More cheese! Binarat now has 10 cheese. (That is 2 cheese. It is binary.)']},
+          {n:'Speak in beeps',t:['* You say “BEEP BOOP.” Binarat gasps. It has never heard its native language from a human.','* BEEP BOOP BEEP. Binarat translates: “you are my best friend.” Oh no.']}],
+    warm:['* Binarat is wagging its tail. In binary. 1, 0, 1, 0.','* Binarat is trying to spell your name in ones and zeros.','* Binarat squeaks happily. 00111010 00101001. (That is a smiley face.)'],
     quips:['* Binarat flips all your bits!','* Binarat chews through your homework!','* Binarat squeaks in hexadecimal. Rude.'],
+    spareTalk:[{w:'enemy',t:'01011001 01000001 01011001!'},{w:'null',t:'It said YAY. I speak fluent zero.'}],
     spare:'* Binarat squeaks “1” (which means YES) and scurries off.',
     win:{w:'null',t:'Ha! You turned that rat into a ZERO. My favorite number.'} },
+
   parrot: { name:'PARROT PARROT', emoji:'🦜', focus:[2,10], pitch:700,
     desc:'Repeats everything twice twice. Doubling is its whole personality personality.',
     intro:'* PARROT PARROT swoops in! It squawks twice. Twice.',
     pre:[{w:'remy',t:'Parrot Parrot. It doubles everything it hears.'},
          {w:'null',t:'Doubles everything? Then double ME! Zero times two is... ZERO! Still perfect!'}],
-    acts:[{n:'Say “hello”',t:'* You say hello. It says HELLO HELLO. You made a friend friend.'},
-          {n:'Teach it a word',t:'* You teach it “PARALLELOGRAM.” It is thrilled thrilled.'}],
+    acts:[{n:'Say “hello”',t:['* You say hello. It says HELLO HELLO. You made a friend friend.','* You say hello again. HELLO HELLO HELLO HELLO. You have created a monster monster.']},
+          {n:'Teach it a word',t:['* You teach it “PARALLELOGRAM.” It is thrilled thrilled.','* You teach it “HYPOTENUSE.” It says “HIPPO-TEN-USE HIPPO-TEN-USE.” Close enough enough.']},
+          {n:'Give it a cracker',t:['* You give it one cracker. It eats it. Twice. Math is broken.','* Another cracker. Parrot Parrot does a little hop hop.']}],
+    warm:['* Parrot Parrot is nuzzling you. Twice.','* Parrot Parrot learned your name. {NAME} {NAME}.','* Parrot Parrot is humming a song. The same note. Twice.'],
     quips:['* Parrot Parrot dive-bombs you! Twice!','* Parrot Parrot repeats your worst mistake. Twice.','* Feathers everywhere. Everywhere.'],
+    spareTalk:[{w:'enemy',t:'BYE BYE! BYE BYE!'},{w:'remy',t:'It said goodbye four times.'},{w:'null',t:'That is two goodbyes, doubled. Doubled.'}],
     spare:'* Parrot Parrot flies away happy happy.',
     win:{w:'remy',t:'Two down. Well, one down. It just felt like two.'} },
+
   decapod: { name:'SIR DECAPOD', emoji:'🦀', focus:[10,2,0,1], boss:true, pitch:200,
     desc:'A crab with TEN legs. Counts on them. Constantly.',
     intro:'* SIR DECAPOD clacks his claws! “BEHOLD MY TEN LEGS!”',
     pre:[{w:'enemy',t:'I am SIR DECAPOD, guardian of the swamp! I have TEN legs! TEN!'},
          {w:'remy',t:'We get it. You have ten legs.'},
          {w:'enemy',t:'Count them. I DARE you.'}],
-    acts:[{n:'Count his legs',t:'* You count all 10 legs. Nobody has ever done this. He is overwhelmed.'},
-          {n:'Walk sideways',t:'* You walk sideways like a crab. Sir Decapod respects the hustle.'}],
+    acts:[{n:'Count his legs',t:['* You count all 10 legs. Nobody has ever done this. He is overwhelmed.','* You count them AGAIN. Still 10. Sir Decapod weeps with joy.']},
+          {n:'Walk sideways',t:['* You walk sideways like a crab. Sir Decapod respects the hustle.','* You moonwalk sideways. Sir Decapod has never seen such skill.']},
+          {n:'Ask about claws',t:['* You ask if claws count as legs. Sir Decapod goes quiet for a very long time.','* “They are... ARM-LEGS,” he whispers. You nod respectfully.']}],
+    warm:['* Sir Decapod is doing a happy little shuffle.','* Sir Decapod is counting YOUR legs. Two. He feels bad for you.','* Sir Decapod is blowing bubbles. Crabs do that when they are happy. Probably.'],
     quips:['* Sir Decapod pinches with all ten... wait, those are legs.','* Sir Decapod scuttles at you sideways!','* “ADD A ZERO!” he yells, for no reason.'],
+    spareTalk:[{w:'enemy',t:'You... you counted my legs. ALL TEN.'},{w:'enemy',t:'Nobody counts past eight. Eight is where they get BORED.'},{w:'remy',t:'He is crying. Can crabs cry?'},{w:'null',t:'He is a crab in a SWAMP, Remy. Everything is wet.'}],
     spare:'* Sir Decapod salutes you with all 10 legs and scuttles into the sunset. Sideways.',
     win:{w:'null',t:'The swamp is clear! Onward to... a mall? Why is there a mall?'} },
 
@@ -661,29 +677,40 @@ const ENEMIES = {
     desc:'A triangle who tries WAY too hard. Three sides. Zero chill.',
     intro:'* TRI-HARD bursts in doing jumping jacks!',
     pre:[{w:'enemy',t:'HEY! HEY! Watch me do 3 push-ups! Then 33! Then 333!'},{w:'remy',t:'Please do not.'}],
-    acts:[{n:'Tell it to chill',t:'* You tell Tri-Hard to chill. It tries REALLY hard to chill. It is sweating.'},
-          {n:'Cheer it on',t:'* You cheer! Tri-Hard does 33 push-ups and cries happy tears.'}],
+    acts:[{n:'Tell it to chill',t:['* You tell Tri-Hard to chill. It tries REALLY hard to chill. It is sweating.','* You tell it to chill again. It meditates so hard a vein pops out.']},
+          {n:'Cheer it on',t:['* You cheer! Tri-Hard does 33 push-ups and cries happy tears.','* You cheer louder! Tri-Hard runs 3 laps around the mall. Then 33.']},
+          {n:'Say “good job”',t:['* You say “good job.” Tri-Hard freezes. Nobody has ever said that. It forgets what it was trying so hard for.','* “Good job” again! Tri-Hard is now trying very hard to accept compliments.']}],
+    warm:['* Tri-Hard is only doing ONE push-up now. Progress.','* Tri-Hard is breathing. Just breathing. It is hard for it.','* Tri-Hard is trying to sit still. Its corners are twitching.'],
     quips:['* Tri-Hard pokes you with its pointy corners!','* Tri-Hard yells “ACUTE ATTACK!” It is very proud of that one.','* Tri-Hard tries too hard. You take damage from the vibes.'],
+    spareTalk:[{w:'enemy',t:'Wait... I can just... stop trying so hard?'},{w:'remy',t:'Yeah. You can just be a triangle.'},{w:'enemy',t:'...This is the HARDEST thing I have ever done.'}],
     spare:'* Tri-Hard finally relaxes. It is now a Tri-Easy.',
     win:{w:'remy',t:'Three sides and not one of them was chill.'} },
+
   clover: { name:'FOUR-LEAF CLOBBER', emoji:'🍀', focus:[4], pitch:360,
     desc:'Claims to be lucky. Is not. Has never won anything.',
     intro:'* FOUR-LEAF CLOBBER wants to fight! It feels lucky!',
     pre:[{w:'enemy',t:'Four leaves means FOUR TIMES the luck! Prepare to lose!'},
          {w:'null',t:'Four times zero luck is still... oh. Oh no. That is sad.'}],
-    acts:[{n:'Make a wish',t:'* You make a wish on its leaves. It blushes an even greener green.'},
-          {n:'Water it',t:'* You water it gently. It perks up. It has never felt so loved.'}],
+    acts:[{n:'Make a wish',t:['* You make a wish on its leaves. It blushes an even greener green.','* Another wish. One of its leaves falls off. It is now a three-leaf clover. It pretends not to notice.']},
+          {n:'Water it',t:['* You water it gently. It perks up. It has never felt so loved.','* More water. It is a little soggy now. But happy.']},
+          {n:'Give it a penny',t:['* You give Clobber a lucky penny. It finally WON something!','* Another penny! Clobber is starting a collection. Two cents. It is rich now.']}],
+    warm:['* Four-Leaf Clobber is humming a happy song. Badly.','* Clobber checked its horoscope. It says “today is your day.” It is right for once.','* Clobber found a horseshoe. It is wearing it as a hat.'],
     quips:['* Four-Leaf Clobber slaps you with four leaves!','* Clobber throws a horseshoe! It misses what it was aiming at. It hits you instead.','* Clobber does a four-leaf spin attack!'],
+    spareTalk:[{w:'enemy',t:'Wait. I got lucky! For real! For the first time EVER!'},{w:'null',t:'Four times the luck, baby!'}],
     spare:'* Four-Leaf Clobber decides its luck is better spent elsewhere.',
     win:{w:'null',t:'Lucky for US, anyway!'} },
+
   highfive: { name:'HIGH FIVE', emoji:'✋', focus:[5,3,4], boss:true, pitch:150,
     desc:'A GIANT hand that just wants a high five. You have left it hanging for YEARS.',
     intro:'* HIGH FIVE rises from the food court! It is... waiting.',
     pre:[{w:'enemy',t:'...'},{w:'enemy',t:'......'},{w:'remy',t:'It wants a high five, {NAME}.'},{w:'enemy',t:'FIVE YEARS. FIVE YEARS I HAVE BEEN LEFT HANGING.'}],
-    acts:[{n:'High five it',t:'* SMACK! A perfect high five. Somewhere, a crowd cheers.'},
-          {n:'Air guitar',t:'* You play air guitar. High Five plays air guitar back. It has 5 fingers. It is better than you.'},
-          {n:'Leave it hanging',t:'* You leave it hanging. It is devastated. ...Wow. That was cold.', joke:true}],
+    acts:[{n:'High five it',t:['* SMACK! A perfect high five. Somewhere, a crowd cheers.','* Another high five! It goes for the double. You nail it. Legendary.']},
+          {n:'Air guitar',t:['* You play air guitar. High Five plays air guitar back. It has 5 fingers. It is better than you.','* Air guitar SOLO! High Five does a power slide. Somebody call a record label.']},
+          {n:'Thumb war',t:['* You challenge it to a thumb war. It has ONE thumb. So do you. Perfectly matched.','* Rematch! It is a tie. High Five says this is the best day of its life.']},
+          {n:'Leave it hanging',joke:true,t:['* You leave it hanging. It is devastated. ...Wow. That was cold.','* You leave it hanging AGAIN. Remy and Nullbert both slowly turn to look at you.']}],
+    warm:['* High Five is wiggling its fingers excitedly.','* High Five is doing jazz hands. It is ALL jazz hands.','* High Five is giving itself a thumbs up.'],
     quips:['* High Five tries to high five you. At 500 miles per hour!','* High Five snaps its fingers! The floor is lava now!','* High Five gives you a thumbs down. Emotional damage!'],
+    spareTalk:[{w:'enemy',t:'Five years... and FINALLY...'},{w:'enemy',t:'Okay. One more. Up high!'},{w:'null',t:'Down low!'},{w:'enemy',t:'...TOO SLOW! HAHA! I have waited FIVE YEARS to do that!'}],
     spare:'* High Five finally got its high five. It waves goodbye with all five fingers.',
     win:{w:'remy',t:'Next stop: the Lunchroom of the Sixth Dimension. I hear the tacos are cursed.'} },
 
@@ -692,11 +719,15 @@ const ENEMIES = {
     intro:'* BUZZ HEX buzzes in! Bzz bzz bzz bzz bzz bzz. (That was 6.)',
     pre:[{w:'enemy',t:'Bzz! Did you know a hexagon has SIX sides? Did you know? Did you KNOW?'},
          {w:'null',t:'I have NO sides. I am a circle. Checkmate.'}],
-    acts:[{n:'Praise hexagons',t:'* You say hexagons are the best shape. Buzz Hex does a happy little dance.'},
-          {n:'Offer honey',t:'* You offer honey. It was already Buzz Hex’s honey. Awkward. But sweet.'}],
+    acts:[{n:'Praise hexagons',t:['* You say hexagons are the best shape. Buzz Hex does a happy little dance.','* You praise hexagons AGAIN. Buzz Hex starts a fan club. You are member #6.']},
+          {n:'Offer honey',t:['* You offer honey. It was already Buzz Hex’s honey. Awkward. But sweet.','* You give its own honey back AGAIN. Buzz Hex respects your commitment to the bit.']},
+          {n:'Draw a hexagon',t:['* You draw a hexagon. It has... five sides. Buzz Hex gently corrects you.','* You draw a REAL hexagon. Six sides. Buzz Hex frames it.']}],
+    warm:['* Buzz Hex is doing the waggle dance. It means “this kid is cool.”','* Buzz Hex is building you a tiny hexagon house.','* Buzz Hex is buzzing in a happier key.'],
     quips:['* Buzz Hex swarms you with six stingers!','* Buzz Hex lectures you about hexagons for six minutes!','* BZZZZZZ!'],
+    spareTalk:[{w:'enemy',t:'Bzz! You are now an honorary bee! Bzz!'},{w:'remy',t:'Do we get stingers?'},{w:'enemy',t:'No. You get a hexagon. Bzz.'}],
     spare:'* Buzz Hex flies off to tell its 6 friends about you.',
     win:{w:'remy',t:'Bees. Why did it have to be bees.'} },
+
   seven: { name:'SEVEN', emoji:'7️⃣', focus:[7], pitch:260,
     desc:'Seven ate nine. Nobody talks about it.',
     intro:'* SEVEN appears! It smells... like nine.',
@@ -704,20 +735,28 @@ const ENEMIES = {
          {w:'enemy',t:'I do not know what you are talking about. *burp*'},
          {w:'null',t:'Why was six afraid of seven? BECAUSE—'},
          {w:'remy',t:'Nullbert, we KNOW.'}],
-    acts:[{n:'Ask about Nine',t:'* Seven sweats nervously. “Nine who? Never met a nine.” It burps.'},
-          {n:'Offer a snack',t:'* You offer a snack. Seven eats it. And the plate. And the table. It looks happier.'}],
+    acts:[{n:'Ask about Nine',t:['* Seven sweats nervously. “Nine who? Never met a nine.” It burps.','* You ask about Nine AGAIN. Seven whispers: “...he tasted like eight plus one.”']},
+          {n:'Offer a snack',t:['* You offer a snack. Seven eats it. And the plate. And the table. It looks happier.','* Another snack. Seven eats it, then eats the word “snack.” How.']},
+          {n:'Tell the joke',t:['* You ask, “Why was 6 afraid of 7?” Seven says, “Because I am SCARY.” That is not the joke.','* You tell the joke right this time. Seven laughs so hard it hiccups. A tiny 9 pops out.']}],
+    warm:['* Seven is patting its belly thoughtfully.','* Seven is looking a little guilty about Nine.','* Something inside Seven is knocking. Seven pretends not to hear it.'],
     quips:['* Seven tries to eat YOU!','* Seven throws lucky 7s! They are not lucky for you.','* Seven chomps!'],
-    spare:'* Seven waddles away, full. It promises to only eat salad from now on.',
+    spareTalk:[{w:'enemy',t:'Okay. FINE. I will let Nine out.'},{t:'*hic* A very small, very annoyed 9 pops out.'},{w:'null',t:'NINE! You are ALIVE!'},{w:'remy',t:'He was in there the WHOLE time?'}],
+    spare:'* Seven waddles away. It promises to only eat salad from now on.',
     win:{w:'null',t:'Nine has been avenged!'} },
+
   octopal: { name:'OCTO-PAL', emoji:'🐙', focus:[8], pitch:480,
     desc:'Has 8 arms. Wants to hug you with ALL of them. Personal space: 0.',
     intro:'* OCTO-PAL wants a hug! Eight of them, actually.',
     pre:[{w:'enemy',t:'HUGS! HUGS FOR EVERYONE! EIGHT HUGS EACH!'},{w:'remy',t:'Do not let it hug you. It does not let go.'}],
-    acts:[{n:'Accept one hug',t:'* You allow ONE hug. Octo-Pal uses all 8 arms anyway. It is actually kind of nice.'},
-          {n:'Set boundaries',t:'* You explain personal space. Octo-Pal takes notes. With 8 pens.'}],
+    acts:[{n:'Accept one hug',t:['* You allow ONE hug. Octo-Pal uses all 8 arms anyway. It is actually kind of nice.','* Another hug. You lose feeling in both arms. Worth it.']},
+          {n:'Set boundaries',t:['* You explain personal space. Octo-Pal takes notes. With 8 pens.','* You set boundaries again. Octo-Pal hugs the boundaries.']},
+          {n:'Shake hands',t:['* You offer a handshake. Octo-Pal shakes with all 8 arms. It takes 4 minutes.','* Octo-Pal invents a secret handshake. It has 64 steps. 8 × 8. You learn all of them.']}],
+    warm:['* Octo-Pal is giving itself a hug. Self-love.','* Octo-Pal has turned pink. That is octopus for “happy.”','* Octo-Pal is waving at you with 3 arms and holding snacks with the other 5.'],
     quips:['* Octo-Pal throws 8 hugs at you!','* Octo-Pal squirts ink! It is scented!','* Octo-Pal does the wave. With all 8 arms.'],
+    spareTalk:[{w:'enemy',t:'Goodbye hug? Just ONE? Okay, eight.'},{w:'remy',t:'...I am stuck.'},{w:'null',t:'We are ALL stuck, Remy.'}],
     spare:'* Octo-Pal waves goodbye. You get 8 high fives on the way out.',
     win:{w:'null',t:'That was the most aggressive friendship I have ever seen.'} },
+
   ninelives: { name:'NINE LIVES', emoji:'🐈‍⬛', focus:[9,6,7,8], boss:true, pitch:330,
     desc:'A cat on its 9th and FINAL life. Very careful now. Wears a helmet.',
     intro:'* NINE LIVES lands on its feet! It always does.',
@@ -725,9 +764,12 @@ const ENEMIES = {
          {w:'remy',t:'What happened to the other eight?'},
          {w:'enemy',t:'We do not talk about Seven.'},
          {w:'null',t:'Seven strikes again...'}],
-    acts:[{n:'Pet it',t:'* You pet Nine Lives. It purrs at 9 decibels. Then 99.'},
-          {n:'Laser pointer',t:'* You wave a laser pointer. Nine Lives completely forgets the fight.'}],
+    acts:[{n:'Pet it',t:['* You pet Nine Lives. It purrs at 9 decibels. Then 99.','* You pet it again. It bites you. Gently. Cats.']},
+          {n:'Laser pointer',t:['* You wave a laser pointer. Nine Lives completely forgets about the fight.','* The laser again! Nine Lives runs into a wall. It acts like it meant to.']},
+          {n:'Open a can',t:['* You open a can of tuna. Nine Lives teleports to you. Physics is confused.','* Another can. Nine Lives is now your cat. You did not ask for this.']}],
+    warm:['* Nine Lives is kneading the floor. Making biscuits.','* Nine Lives slow-blinks at you. In cat, that means “I trust you.” Or “you are food.”','* Nine Lives is sitting in a box that was not there before.'],
     quips:['* Nine Lives scratches! Nine times!','* Nine Lives knocks your stuff off the table. On purpose. While looking at you.','* Nine Lives coughs up a hairball shaped like a 9!'],
+    spareTalk:[{w:'enemy',t:'I suppose... you may live. For now.'},{w:'enemy',t:'Also, I have decided you are my human. Bring tuna. Daily.'},{w:'remy',t:'That is how cats work. You do not choose them.'}],
     spare:'* Nine Lives curls up in a sunbeam and naps. Battle over. Cat wins, technically.',
     win:{w:'remy',t:'Onward. The Dozen Dungeon is next. It smells like muffins.'} },
 
@@ -737,11 +779,15 @@ const ENEMIES = {
     pre:[{w:'enemy',t:'Going up? I stop at floors 11, 22, 33, 44... Which floor, please?'},
          {w:'remy',t:'We want floor 1.'},
          {w:'enemy',t:'I am sorry. That is not a multiple of 11.'}],
-    acts:[{n:'Press all buttons',t:'* You press every button. The Elevenator is horrified. Then impressed.'},
-          {n:'Hum along',t:'* You hum the elevator music. The Elevenator feels SEEN.'}],
+    acts:[{n:'Press all buttons',t:['* You press every button. The Elevenator is horrified. Then impressed.','* You press them all AGAIN. The Elevenator plays the alarm bell. It is kind of a banger.']},
+          {n:'Hum along',t:['* You hum the elevator music. The Elevenator feels SEEN.','* You hum the B-side. The Elevenator did not know there WAS a B-side.']},
+          {n:'Make small talk',t:['* You say, “Nice weather today.” The Elevenator has no windows. It is deeply moved anyway.','* You ask how it is doing. “Oh, up and down,” it says. It has waited YEARS to say that.']}],
+    warm:['* The Elevenator is playing a happier song now.','* DING! The Elevenator dinged for no reason. It is excited.','* The Elevenator is holding the door for you.'],
     quips:['* The Elevenator doors close on you! Ding!','* The elevator music gets LOUDER!','* The Elevenator drops 11 floors at once!'],
+    spareTalk:[{w:'enemy',t:'Going... down? Just this once. For you.'},{w:'null',t:'FLOOR ZERO! MY KINGDOM!'},{w:'remy',t:'It is a basement, Nullbert.'}],
     spare:'* DING! The Elevenator takes you to floor 0. Nullbert is delighted.',
     win:{w:'null',t:'Floor ZERO. My floor. Fabulous.'} },
+
   baker: { name:'THE DOZEN BAKER', emoji:'🧁', focus:[12,11], boss:true, pitch:240,
     desc:'Bakes everything in dozens. Once gave someone 13. Still will not talk about it.',
     intro:'* THE DOZEN BAKER bursts out of the oven! It smells amazing!',
@@ -750,9 +796,12 @@ const ENEMIES = {
          {w:'enemy',t:'...That is not a dozen of anything!'},
          {w:'remy',t:'Ask him about the baker’s dozen.'},
          {w:'enemy',t:'WE DO NOT SPEAK OF THIRTEEN.'}],
-    acts:[{n:'Compliment muffins',t:'* You compliment the muffins. The Dozen Baker gives you 12 more. You put them... somewhere.'},
-          {n:'Ask for 13',t:'* You ask for a baker’s dozen. His eye twitches. But... he does it. Growth.'}],
+    acts:[{n:'Compliment muffins',t:['* You compliment the muffins. The Dozen Baker gives you 12 more. You put them... somewhere.','* You compliment them again. 12 MORE muffins. You are now made of muffins.']},
+          {n:'Ask for 13',t:['* You ask for a baker’s dozen. His eye twitches. But... he does it. Growth.','* You ask for 13 again. He does it without screaming this time. So proud of him.']},
+          {n:'Bake together',t:['* You add 12 chocolate chips. He adds 132 more. 12 × 12 = 144. A GROSS. Delicious.','* Round two. You burn it. He calls it “rustic.” What a guy.']}],
+    warm:['* The Dozen Baker is humming while kneading dough.','* The Dozen Baker offers you a muffin. Just ONE. He is trying something new.','* The Dozen Baker is drawing a smiley face in the flour.'],
     quips:['* The Dozen Baker throws 12 hot muffins at you!','* Flour cloud! You cannot see!','* The Dozen Baker rolls you flat with a rolling pin!'],
+    spareTalk:[{w:'enemy',t:'You know what? Thirteen is... fine. Thirteen is okay.'},{w:'enemy',t:'Here. Take TWO baker’s dozens. That is 26! I did that in my head!'},{w:'remy',t:'Math growth AND personal growth.'}],
     spare:'* The Dozen Baker packs you a dozen muffins for the road. Okay, thirteen.',
     win:{w:'remy',t:'The Teen Spire is next. 13, 14, 15. The Great Divider is waiting at the top.'} },
 
@@ -760,21 +809,29 @@ const ENEMIES = {
     desc:'A cracked mirror. Seven years of bad luck, and it is only on year one.',
     intro:'* UNLUCKY 13 appears! A black cat walks by. A ladder falls over.',
     pre:[{w:'enemy',t:'Nobody wants floor 13. Nobody wants seat 13. NOBODY WANTS ME.'},{w:'remy',t:'...Oh no. I relate to this.'}],
-    acts:[{n:'Tell it a secret',t:'* You whisper: “13 is a prime number. That is actually cool.” Unlucky 13 is stunned.'},
-          {n:'Knock on wood',t:'* You knock on wood. Somehow this helps. Its cracks look smaller.'}],
+    acts:[{n:'Tell it a secret',t:['* You whisper, “13 is a prime number. That is actually cool.” Unlucky 13 is stunned.','* Another secret: “Buildings skip floor 13, but it is still there. Waiting.” Unlucky 13 feels POWERFUL.']},
+          {n:'Knock on wood',t:['* You knock on wood. Somehow this helps. Its cracks look smaller.','* You knock again. A woodpecker knocks back. Lucky!']},
+          {n:'Sit in seat 13',t:['* You sit in seat 13. On purpose. Unlucky 13 does not know how to handle this.','* You put your stuff in locker 13 too. Unlucky 13 is speechless.']}],
+    warm:['* Unlucky 13 found a four-leaf clover. It looks familiar.','* Unlucky 13’s cracks are glittering a little.','* Unlucky 13 is checking its reflection. It kind of likes what it sees.'],
     quips:['* Unlucky 13 reflects your mistakes back at you!','* A ladder falls on you. Unlucky!','* Unlucky 13 spills salt everywhere!'],
+    spareTalk:[{w:'enemy',t:'Nobody ever picked me on purpose before.'},{w:'remy',t:'Hey. Leftovers and unlucky numbers. We gotta stick together.'},{w:'enemy',t:'...Best friends?'},{w:'remy',t:'Let us not get crazy.'}],
     spare:'* Unlucky 13 feels lucky for the first time. Remy gives it a fist bump.',
     win:{w:'remy',t:'For the record, I think thirteen is fine.'} },
+
   karat: { name:'14 KARAT', emoji:'💍', focus:[14], pitch:620,
     desc:'Pure gold. Very rich. Has never done its own math. Has a butler for that.',
     intro:'* 14 KARAT sparkles in! Ugh. So shiny.',
     pre:[{w:'enemy',t:'Do you KNOW how much I am worth? Neither do I. My butler does the math.'},
          {w:'null',t:'I am worth ZERO and I have NEVER been happier.'}],
-    acts:[{n:'Do its math',t:'* You do 14 Karat’s math for free. It has never seen such kindness.'},
-          {n:'Polish it',t:'* You polish 14 Karat. It gleams. It says “thank you” for the first time ever.'}],
+    acts:[{n:'Do its math',t:['* You do 14 Karat’s math for free. It has never seen such kindness.','* You do its math again. 14 Karat asks you to TEACH it. Character development!']},
+          {n:'Polish it',t:['* You polish 14 Karat. It gleams. It says “thank you” for the first time ever.','* You polish it so hard you see your reflection. You look great. Like a math genius.']},
+          {n:'Ask about the butler',t:['* You ask the butler how he is. He says nobody has asked in 14 years. He tears up.','* The butler gives you a thumbs up. 14 Karat is jealous of its own butler.']}],
+    warm:['* 14 Karat is trying to do 14 × 2 by itself. It is so close.','* 14 Karat is being slightly less shiny. Out of respect.','* 14 Karat just said “please.” The butler fainted.'],
     quips:['* 14 Karat blinds you with BLING!','* 14 Karat throws coins at you! Rude AND expensive!','* 14 Karat calls its butler. The butler attacks!'],
+    spareTalk:[{w:'enemy',t:'14 times 2 is... 28! I DID IT! BY MYSELF!'},{w:'null',t:'Proud of you, shiny guy.'}],
     spare:'* 14 Karat leaves you a big tip and rolls away.',
     win:{w:'null',t:'Fourteen karats. Zero manners.'} },
+
   famous: { name:'FAMOUS FIFTEEN', emoji:'🤳', focus:[15,13,14], boss:true, pitch:450,
     desc:'Wants 15 minutes of fame. Has been livestreaming this fight the whole time.',
     intro:'* FAMOUS FIFTEEN is LIVE! 15 viewers watching!',
@@ -782,9 +839,13 @@ const ENEMIES = {
          {w:'remy',t:'Is it... filming us?'},
          {w:'enemy',t:'Smash that like button! Let us get this to 15 likes!'},
          {w:'null',t:'Hi Mom!'}],
-    acts:[{n:'Like & subscribe',t:'* You like and subscribe. Famous Fifteen is overjoyed. 16 viewers now!'},
-          {n:'Ignore the camera',t:'* You ignore the camera. Famous Fifteen realizes real friends do not need views.'}],
+    acts:[{n:'Like & subscribe',t:['* You like and subscribe. Famous Fifteen is overjoyed. 16 viewers now!','* You hit the bell icon too. Famous Fifteen faints. 17 viewers!']},
+          {n:'Ignore the camera',t:['* You ignore the camera. Famous Fifteen realizes real friends do not need views.','* You ignore it again. Famous Fifteen puts the phone down. Its hands do not know what to do.']},
+          {n:'Leave a comment',t:['* You comment “first!” You are not first. You are 15th. Famous Fifteen is thrilled.','* You comment “great content.” Famous Fifteen makes it its profile picture.']},
+          {n:'Photobomb',joke:true,t:['* You photobomb the stream. Chat goes wild. (No math, no mercy. But LOL.)','* You photobomb AGAIN. Chat is now calling YOU the main character.']}],
+    warm:['* Famous Fifteen turned the camera around. It is filming YOU now.','* Chat is spamming “W.” Famous Fifteen is glowing.','* Famous Fifteen forgot to check its views for almost 15 seconds.'],
     quips:['* Famous Fifteen blasts you with a ring light!','* Famous Fifteen does a TREND at you!','* Famous Fifteen reads your mean comments out loud!'],
+    spareTalk:[{w:'enemy',t:'Okay chat, I gotta go. I made a real friend today.'},{w:'enemy',t:'...Chat says “who cares.” Chat is so mean.'},{w:'null',t:'Chat is a HATER.'}],
     spare:'* Famous Fifteen ends the stream. “Thanks for watching, fam.” It walks off, happier.',
     win:{w:'remy',t:'This is it. The top of the spire. The Great Divider.'} },
 
@@ -797,9 +858,11 @@ const ENEMIES = {
          {w:'null',t:'And the Wi-Fi?!'},
          {w:'enemy',t:'ESPECIALLY the Wi-Fi.'},
          {w:'null',t:'MONSTER!'}],
-    acts:[{n:'Talk to it',t:'* You tell the Divider that not everything has to split evenly. It hesitates.'},
-          {n:'Let Remy speak',t:'* Remy: “Being left over is not a bad thing. It just means you are... extra.” The Divider flinches.'},
-          {n:'Share a pizza',t:'* You offer the Divider a slice. Not half. Just a slice. It is very confused.'}],
+    acts:[{n:'Talk to it',t:['* You tell the Divider that not everything has to split evenly. It hesitates.','* You keep talking. The Divider mutters, “I just wanted things to be... even.” Huh.']},
+          {n:'Let Remy speak',t:['* Remy: “Being left over is not a bad thing. It just means you are... extra.” The Divider flinches.','* Remy: “Leftovers are the best part of Thanksgiving.” The Divider has no response to this.']},
+          {n:'Share a pizza',t:['* You offer the Divider a slice. Not half. Just a slice. It is very confused.','* Another slice. The Divider eats it WITHOUT cutting it in half first. Progress!']},
+          {n:'Let Nullbert speak',t:['* Nullbert: “I have been divided by NOTHING and I am FINE!” Nobody knows what that means.','* Nullbert just yells “WI-FI!” over and over. The Divider covers its... ears? Brackets?']}],
+    warm:['* The Great Divider’s bracket is wobbling.','* The Great Divider is staring at a pizza slice. Not cutting it. Just staring.','* The Great Divider’s eyes look a little less red.'],
     quips:['* The Great Divider splits the room in two!','* The Great Divider casts LONG DIVISION! It takes forever!','* “THERE WILL BE NO REMAINDERS!”','* The Great Divider divides your attention!'],
     phase2:[{w:'enemy',t:'Why... why do you keep getting the answers RIGHT?!'},
             {w:'remy',t:'Because we practiced. That is it. That is the whole secret.'},
@@ -811,9 +874,12 @@ const ENEMIES = {
     intro:'* A GLITCH GREMLIN crawls out of the pit! It knows your weak spots.',
     pre:[{w:'remy',t:'The Glitch Pit. It is made of every fact you have ever missed.'},
          {w:'null',t:'Beat it enough and those facts stop being weak. SCIENCE!'}],
-    acts:[{n:'Debug it',t:'* You debug the Gremlin. Three bugs fall out. Gross.'},
-          {n:'Turn it off and on',t:'* You turn it off and on again. It is... working better?'}],
+    acts:[{n:'Debug it',t:['* You debug the Gremlin. Three bugs fall out. Gross.','* More bugs. One of them is wearing a tiny hat.']},
+          {n:'Turn it off and on',t:['* You turn it off and on again. It is... working better?','* Off and on again. It now has a loading bar. 99%... 99%... 99%...']},
+          {n:'Read the error',t:['* You read its error message: “ERR: TOO MUCH PRACTICE.” The Gremlin looks scared.','* New error: “ERR: KID IS GETTING GOOD.” The Gremlin starts packing.']}],
+    warm:['* The Glitch Gremlin is buffering.','* The Glitch Gremlin flickers. Some of its pixels look... fixed.','* The Glitch Gremlin installed an update. It is called “being nice.”'],
     quips:['* The Glitch Gremlin throws your old mistakes at you!','* ERR0R! ERR0R! ERR0R!','* The Gremlin scrambles the screen! (Not really. But scary.)'],
+    spareTalk:[{w:'enemy',t:'Error 404: Grudge not found.'},{w:'null',t:'That is computer for “we cool.”'}],
     spare:'* The Glitch Gremlin crawls back into the pit. For now.',
     win:{w:'remy',t:'Weak spots: getting less weak.'} },
 };
@@ -892,6 +958,12 @@ const BANTER = [
 const SNACKS = ['a Square Root Beer','a slice of Pi (blueberry)','three-quarters of a sandwich','a Cinnamon Prime Roll','a bowl of Mathcaroni','an Infinity Fry (it never ends)','Nullbert’s Zero-Calorie Donut (it is just the hole)','a Fraction Bar'];
 const IDLE = ['is waiting.','looks at you funny.','is thinking about math. Badly.','is humming a weird song.','smells like a pencil eraser.','does a little dance.','checks its phone.','refuses to blink.','is pretending not to be nervous.'];
 const CRIT_LINES = [{w:'null',t:'CRITICAL! I taught them that.'},{w:'remy',t:'Okay. That was actually cool.'},{w:'null',t:'FAST! Faster than light! Well. Faster than Remy.'},{w:'remy',t:'Speedy. Nice.'}];
+// Wrong answer during ACT
+const FLOP = ['* It did not quite land. {E} looks confused.','* {E} stares at you. You stare back. Nobody wins.','* You tried. {E} gives you a polite golf clap.','* {E} did not get it. Remy pretends he did not see that.','* That was awkward. Even Nullbert is cringing, and he does not have a face.','* {E} tilts its head like a confused dog.','* Somewhere, a cricket chirps. {E} waits for you to try again.'];
+// SPARE pressed too early
+const NOT_READY = ['* You hold out your hand. {E} slaps it away. Not yet!','* You try to spare {E}. {E} pretends it did not hear you.','* {E} is not ready. It needs more... vibes.','* You say “let us be friends.” {E} says “we will see.”'];
+// Remy & Nullbert react after a successful ACT
+const ACT_LINES = [{w:'remy',t:'Okay, that was actually nice.'},{w:'null',t:'Diplomacy! I could never. I would have just zeroed it.'},{w:'remy',t:'See? Words work. Sometimes.'},{w:'null',t:'I am taking notes. Step one: be nice. Step two: ...what was step one?'},{w:'remy',t:'Smooth.'},{w:'null',t:'Is this friendship? Is this what it feels like? Gross. I love it.'},{w:'remy',t:'I did not know monsters could blush.'},{w:'null',t:'That was beautiful. I am not crying. Zeros do not cry.'}];
 const MISS_LINES = [{w:'remy',t:'Shake it off. Now you know that one.'},{w:'null',t:'Mistakes are just facts you have not met yet!'},{w:'remy',t:'Hey. That trick works every time.'}];
 
 /* ---------- 6. UI pieces ---------- */
@@ -1173,7 +1245,7 @@ async function startBattle(id){
   const hp = E.final ? 180 : E.boss ? 60 + 18*zi : 30 + 12*zi;
   const B = Object.assign({ E, zi, hp, maxHp:hp, mercy:0, snacks:2, combo:0, heroHp:maxHeroHp(), heroMax:maxHeroHp(), xp:0, recent:[],
     edmg: 3 + 2*zi + (E.boss ? 1 : 0), dodgeN: zi === 0 ? 2 : 3, weak: id === 'glitch', phase2:false,
-    mercyGain: E.final ? 20 : E.boss ? 25 : 34 }, buildPools(E));
+    mercyGain: E.final ? 20 : E.boss ? 25 : 34, actUses:{} }, buildPools(E));
   renderBattle(B);
   music(E.boss ? 'boss' : 'battle');
   if(!S.cleared[id] && E.pre) await say(E.pre, E);
@@ -1184,7 +1256,8 @@ async function startBattle(id){
     // ----- player's turn -----
     const box = $('#box');
     box.innerHTML = '<div class="narr"></div>';
-    typeText($('.narr', box), first ? `* ${E.desc}` : `* ${E.name} ${pick(IDLE)}`, 240, 16);
+    const flavor = first ? `* ${E.desc}` : (B.mercy >= 50 && E.warm && Math.random() < 0.8) ? pick(E.warm) : `* ${E.name} ${pick(IDLE)}`;
+    typeText($('.narr', box), fmt(flavor), 240, 16);
     first = false;
     const action = await menu([
       { label:'⚔ FIGHT', value:'fight' },
@@ -1193,7 +1266,7 @@ async function startBattle(id){
       { label:'♥ SPARE', value:'spare', cls: B.mercy >= 100 ? 'ready' : '' },
     ]);
     if(action === 'fight'){
-      const q = genQ(B, 'm');
+      const q = genQ(B, Math.random() < 0.5 ? 'm' : 'd');
       const r = await askTyped(q, '⚔ FIGHT! Faster answers hit harder.');
       if(r.correct){
         B.combo++;
@@ -1213,18 +1286,23 @@ async function startBattle(id){
     else if(action === 'act'){
       const choice = await menu([...E.acts.map((a,i) => ({ label:a.n, value:i })), { label:'🔍 Check', value:'check' }, { label:'← Back', value:'back' }], true);
       if(choice === 'back') continue;
-      if(choice === 'check'){ await boxSay(`* ${E.name}\n* ${E.desc}\n* Focus: ${E.focus === 'weak' ? 'YOUR weak spots' : '× and ÷ by ' + E.focus.join(', ')}`); continue; }
+      if(choice === 'check'){ await boxSay(`* ${E.name}\n* ${E.desc}\n* Focus: ${E.focus === 'weak' ? 'YOUR weak spots' : '× and ÷ with ' + E.focus.join(', ')}`); continue; }
       const act = E.acts[choice];
-      if(act.joke){ await boxSay(act.t); }
+      const used = B.actUses[choice] || 0;
+      const actText = Array.isArray(act.t) ? act.t[Math.min(used, act.t.length-1)] : act.t;
+      if(act.joke){ B.actUses[choice] = used + 1; await boxSay(actText); }
       else {
-        const q = genQ(B, 'd');
+        const q = genQ(B, Math.random() < 0.5 ? 'm' : 'd');
         const r = await askTyped(q, `✦ ${act.n}! Solve it to make it land:`);
         if(r.correct){
+          B.actUses[choice] = used + 1;
+          const before = B.mercy;
           B.xp += 4; B.mercy = Math.min(100, B.mercy + B.mercyGain); updEnemy(B); sfx.mercy();
-          await boxSay(`${act.t}\n<MERCY +${B.mercyGain}%>`);
+          await boxSay(`${actText}\n<MERCY +${B.mercy - before}%>`);
           if(B.mercy >= 100) await boxFlash(`* <span class="yellow">${E.name} is ready to be SPARED!</span>`, 1400);
+          else if(Math.random() < 0.4) await companionLine(pick(ACT_LINES));
         } else {
-          await boxSay(`* It did not quite land. ${E.name} looks confused.`);
+          await boxSay(pick(E.flop || FLOP).replace(/\{E\}/g, E.name));
         }
       }
     }
@@ -1236,7 +1314,7 @@ async function startBattle(id){
     }
     else if(action === 'spare'){
       if(B.mercy >= 100) return winBattle(B, 'spare');
-      await boxFlash(`* ${E.name} is not ready to be spared.\n* Use ACT to fill the MERCY bar first!`, 1800);
+      await boxFlash(`${pick(NOT_READY).replace(/\{E\}/g, E.name)}\n* (Use ACT to fill the MERCY bar first!)`, 1900);
       continue;
     }
     if(B.hp <= 0) return winBattle(B, 'fight');
@@ -1253,7 +1331,11 @@ async function winBattle(B, how){
   const E = B.E;
   music(null); setControls('');
   if(how === 'fight'){ $('#eWrap').classList.add('dead'); sfx.win(); await boxSay(`* ${E.name} was defeated!`); }
-  else { sfx.mercy(); $('#eWrap').classList.add('spared'); await boxSay(E.spare); sfx.win(); }
+  else {
+    sfx.mercy();
+    if(E.spareTalk) await say(E.spareTalk, E);
+    $('#eWrap').classList.add('spared'); await boxSay(E.spare); sfx.win();
+  }
   const firstTime = !S.cleared[E.id];
   const xp = B.xp + 20 + 5*B.zi + (how === 'spare' ? 10 : 0);
   const ups = gainXp(xp);
@@ -1462,8 +1544,9 @@ function showSettings(){
       <div class="srow"><label>Sound effects</label><button class="segb ${s.sound ? 'on' : ''}" id="snd">${s.sound ? 'ON' : 'OFF'}</button></div>
       <div class="srow"><label>Music</label><button class="segb ${s.music ? 'on' : ''}" id="mus">${s.music ? 'ON' : 'OFF'}</button></div>
       <div class="help"><b>HOW TO PLAY</b><br>
-        <b>FIGHT</b> asks a multiplication fact. Type the answer. Under 2.5 seconds is a CRITICAL hit, and answers in a row build a COMBO.<br>
-        <b>ACT</b> asks a division fact (sometimes “7 × ? = 56”). Right answers fill the MERCY bar. At 100%, <b>SPARE</b> wins peacefully.<br>
+        <b>FIGHT</b> and <b>ACT</b> both ask a mix of × and ÷ facts (sometimes “7 × ? = 56”). Type the answer.<br>
+        <b>FIGHT</b>: under 2.5 seconds is a CRITICAL hit, and answers in a row build a COMBO.<br>
+        <b>ACT</b>: right answers make the act land and fill the MERCY bar. Each monster has its own acts, and some say something new the second time. At 100%, <b>SPARE</b> wins peacefully.<br>
         <b>SNACK</b> heals. You get 2 per fight.<br>
         When the monster attacks, answer bubbles fall. Tap the right one before it hits the floor!<br>
         Miss a fact? You see a trick for it, then type the answer once to lock it in.</div>
