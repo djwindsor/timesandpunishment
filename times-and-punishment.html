@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Times&amp;Punish">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="times-and-punishment-icon.png">
+<title>TIMES &amp; PUNISHMENT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   TIMES & PUNISHMENT — styles
+   ========================================================= */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:#fff}
+body{font-family:'VT323',ui-monospace,Menlo,Consolas,monospace;font-size:24px;line-height:1.15;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;overflow:hidden;-webkit-text-size-adjust:100%}
+.px{font-family:'Press Start 2P',ui-monospace,monospace;line-height:1.35}
+#app{position:relative;max-width:980px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 8px)}
+.screen{flex:1;display:flex;flex-direction:column;min-height:0}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;padding-bottom:20px}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer;touch-action:manipulation;padding:0}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.btn{font-family:'Press Start 2P',monospace;font-size:15px;line-height:1.4;color:#ff9f1c;border:3px solid #ff9f1c;background:#000;padding:14px 18px}
+.btn:active{color:#ffd23f;border-color:#ffd23f;background:#1a1300}
+.btn.big{font-size:18px;padding:18px 24px}
+.btn.small{font-size:12px;padding:10px 12px}
+input{font-family:'VT323',monospace;font-size:30px;background:#000;color:#fff;border:3px solid #fff;padding:8px 12px;outline:none;-webkit-user-select:text;user-select:text;width:100%;max-width:360px}
+input:focus{border-color:#ffd23f}
+.good{color:#3ce07a}.bad{color:#ff5a5a}.yellow{color:#ffd23f}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,210,63,.0)}50%{box-shadow:0 0 0 4px rgba(255,210,63,.55)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@keyframes popup{0%{transform:translate(-50%,0) scale(.6);opacity:0}15%{transform:translate(-50%,-10px) scale(1.2);opacity:1}100%{transform:translate(-50%,-70px) scale(1);opacity:0}}
+@keyframes whiteflash{0%,100%{filter:none}30%{filter:brightness(4) saturate(0)}}
+
+/* ---------- title ---------- */
+.title{align-items:center;justify-content:center;text-align:center;gap:18px}
+.tsprites{display:flex;gap:26px;align-items:flex-end;justify-content:center}
+.tsprites canvas{animation:bob 1.8s ease-in-out infinite}
+.tsprites canvas:nth-child(2){animation-delay:.3s}
+.tsprites canvas:nth-child(3){animation-delay:.6s}
+.logo{font-size:clamp(26px,6vw,48px);color:#ffd23f;margin:6px 0;text-shadow:4px 4px 0 #b3261e,8px 8px 0 #3d1a00}
+.logo span{color:#fff}
+.tsub{font-size:28px;color:#ccc}
+.tbtns{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:460px}
+.tfoot{font-size:20px;color:#777;margin-top:10px}
+
+/* ---------- scenes (intro / ending) ---------- */
+.scene{align-items:center;justify-content:flex-start;padding-top:8vh}
+.stage{display:flex;gap:40px;align-items:flex-end;justify-content:center}
+.stage canvas{transition:opacity .5s, transform .5s;animation:bob 2s ease-in-out infinite}
+.stage canvas.hidden{opacity:0;transform:scale(.4)}
+.scene.glitch{animation:glitch .9s steps(6)}
+@keyframes glitch{0%{filter:none}20%{filter:hue-rotate(90deg) invert(1);transform:translate(8px,-4px)}40%{filter:hue-rotate(200deg);transform:translate(-10px,6px)}60%{filter:invert(1) contrast(3);transform:translate(5px,3px)}80%{filter:hue-rotate(300deg);transform:translate(-3px,-6px)}100%{filter:none}}
+.endcard{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;justify-content:center;flex:1}
+.endcard .bigend{font-size:clamp(28px,7vw,54px);color:#ffd23f}
+
+/* ---------- dialog overlay ---------- */
+#dialog{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 10px);width:min(956px,calc(100% - 24px));background:#000;border:4px solid #fff;display:none;gap:18px;padding:16px 18px 26px;z-index:40;min-height:150px;align-items:flex-start}
+#dialog.show{display:flex}
+#dialog .dbody{flex:1}
+.dname{font-family:'Press Start 2P',monospace;font-size:14px;color:#ffd23f;margin-bottom:10px;min-height:14px}
+.dtext{font-size:30px;white-space:pre-wrap;line-height:1.2}
+.more{position:absolute;right:14px;bottom:6px;animation:blink 1s steps(2) infinite;color:#ffd23f}
+
+/* ---------- battle ---------- */
+#battle{position:relative}
+.pausebtn{position:absolute;right:0;top:0;z-index:5;font-size:20px;border:2px solid #555;color:#aaa;width:44px;height:40px}
+.enemyArea{display:flex;align-items:center;justify-content:center;gap:26px;flex:0 0 auto;min-height:140px;position:relative;padding:4px 50px 4px 0}
+.spriteWrap{animation:bob 1.6s ease-in-out infinite;position:relative}
+.spriteWrap.hit canvas{animation:shake .35s, whiteflash .35s}
+.spriteWrap.dead{transition:opacity 1s, transform 1s;opacity:0;transform:scale(.3) rotate(25deg)}
+.spriteWrap.spared{transition:opacity 1.2s, filter 1.2s;opacity:.25;filter:grayscale(1) brightness(2)}
+.enemyInfo{min-width:200px;max-width:360px;flex:1}
+.ename{font-size:15px;margin-bottom:6px}
+.edesc{font-size:20px;color:#aaa}
+.barrow{display:flex;align-items:center;gap:8px;margin:6px 0}
+.lbl{width:66px;font-size:21px;color:#bbb}
+.pct{width:46px;font-size:21px;color:#ff9be6;text-align:right}
+.bar{flex:1;height:16px;background:#6a1414;border:2px solid #fff;position:relative;overflow:hidden}
+.bar .fill{height:100%;background:#ffd23f;width:100%;transition:width .45s}
+.mercybar{background:#262626}
+.mercybar .fill{background:#ff7ad9;width:0}
+.box{flex:1 1 auto;min-height:210px;border:4px solid #fff;margin:6px 0;position:relative;overflow:hidden;padding:14px 18px;font-size:30px}
+.narr{white-space:pre-wrap;line-height:1.2}
+.narr .who{color:#ffd23f}
+.box .more{position:absolute;right:12px;bottom:6px}
+.party{display:flex;align-items:center;gap:16px;flex:0 0 auto;padding:2px 0;position:relative}
+.pcard{display:flex;align-items:center;gap:10px;flex:1;max-width:420px;border:2px solid #3d74e0;padding:6px 10px;position:relative}
+.pinfo{flex:1}
+.pname{font-size:22px}
+.pname .lv{color:#ffd23f}
+.herobar .fill{background:#3ce07a}
+.hptxt{font-size:20px;color:#ccc;display:flex;justify-content:space-between}
+.combo{color:#ffd23f}
+.pals{display:flex;gap:10px}
+.pal{display:flex;flex-direction:column;align-items:center;font-size:16px;color:#aaa}
+.party.hurt .pcard{animation:shake .4s;border-color:#ff3b3b}
+.dmg{position:absolute;left:50%;top:10px;font-family:'Press Start 2P',monospace;font-size:26px;color:#ff4a4a;text-shadow:3px 3px 0 #000;animation:popup 1.1s forwards;pointer-events:none;z-index:6;white-space:nowrap}
+.dmg.crit{color:#ffd23f;font-size:30px}
+.dmg.heal{color:#3ce07a}
+.controls{flex:0 0 auto;min-height:136px;display:flex;align-items:stretch}
+.menu{display:grid;gap:10px;width:100%}
+.mbtn{font-family:'Press Start 2P',monospace;font-size:15px;color:#ff9f1c;border:3px solid #ff9f1c;background:#000;padding:10px 6px;min-height:62px;line-height:1.4}
+.mbtn:active{color:#ffd23f;border-color:#ffd23f;background:#1a1300}
+.mbtn.ready{color:#ffd23f;border-color:#ffd23f;animation:pulse 1s infinite}
+.mbtn.dim{color:#7a5a2a;border-color:#7a5a2a}
+.menu.sub .mbtn{font-family:'VT323',monospace;font-size:28px;line-height:1.05}
+.keypad{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;width:100%}
+.key{font-family:'Press Start 2P',monospace;font-size:24px;border:3px solid #fff;background:#111;color:#fff;min-height:62px}
+.key:active{background:#ffd23f;color:#000}
+.key.ok{border-color:#3ce07a;color:#3ce07a}
+.key.del{border-color:#ff7a7a;color:#ff7a7a}
+.hintline{display:flex;align-items:center;justify-content:center;width:100%;font-size:28px;color:#aaa;text-align:center;border:2px dashed #444}
+.qwrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;text-align:center}
+.qtitle{font-size:27px;color:#ffd23f}
+.qtitle.small{font-size:24px;color:#aaa}
+.qtext{font-family:'Press Start 2P',monospace;font-size:clamp(24px,5.6vw,46px);white-space:nowrap;line-height:1.3}
+.qtext.fact{color:#3ce07a}
+.qtext.entry{font-size:clamp(20px,4.2vw,34px)}
+.ans{display:inline-block;min-width:2.3em;border-bottom:4px solid #ffd23f;color:#ffd23f;text-align:center}
+.ans.right{color:#3ce07a;border-color:#3ce07a}
+.ans.wrong{color:#ff5a5a;border-color:#ff5a5a}
+.ans.shake{animation:shake .3s}
+.timer{width:80%;height:12px;border:2px solid #fff}
+.tfill{height:100%;width:100%;background:#3ce07a}
+.qfb{min-height:1.2em;font-size:28px}
+.hint{font-size:26px;color:#8fe9ff;max-width:95%}
+.arena{position:absolute;inset:0;--orb:80px}
+.dq{position:absolute;left:0;right:0;top:0;text-align:center;font-family:'Press Start 2P',monospace;font-size:clamp(20px,4.4vw,34px);z-index:3;background:linear-gradient(#000 72%,rgba(0,0,0,0));padding:12px 0 18px}
+.amsg{position:absolute;left:0;right:0;top:46%;text-align:center;font-family:'Press Start 2P',monospace;font-size:clamp(20px,4.4vw,34px);z-index:4;text-shadow:3px 3px 0 #000}
+.floor{position:absolute;left:0;right:0;bottom:0;height:5px;background:repeating-linear-gradient(90deg,#ff3b3b 0 14px,transparent 14px 28px);z-index:2}
+.orb{position:absolute;left:0;top:0;width:var(--orb);height:var(--orb);border-radius:50%;border:3px solid #fff;background:radial-gradient(circle at 35% 30%,#5a5a7a,#15151f);font-family:'Press Start 2P',monospace;font-size:calc(var(--orb) * .26);color:#fff;display:flex;align-items:center;justify-content:center;will-change:transform;z-index:1;transition:opacity .3s, background .15s}
+.orb.good{background:#3ce07a;color:#000;border-color:#3ce07a}
+.orb.bad{background:#ff3b3b;border-color:#ff3b3b}
+.orb.reveal{background:#3ce07a;color:#000}
+.orb.fizz{opacity:0}
+#flash{position:fixed;inset:0;background:#f00;opacity:0;pointer-events:none;z-index:50;transition:opacity .3s}
+
+/* ---------- pause ---------- */
+#pause{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:60;display:none;align-items:center;justify-content:center}
+#pause.show{display:flex}
+.pbox{border:4px solid #fff;background:#000;padding:28px;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center}
+.pbox .small{font-size:20px;color:#888}
+
+/* ---------- map ---------- */
+.mapHead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:8px;border-bottom:2px solid #333}
+.mlogo{font-size:15px;color:#ffd23f;flex:1;min-width:200px}
+.herochip{display:flex;align-items:center;gap:8px;font-size:22px}
+.xpbar{width:100px;height:10px;border:2px solid #fff;background:#222}
+.xpbar div{height:100%;background:#7ab8ff}
+.hbtns{display:flex;gap:8px}
+.zone{border:3px solid var(--zc);margin:12px 0;padding:12px;position:relative}
+.zone.zlocked{opacity:.4}
+.zhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.zname{font-size:13px;color:var(--zc)}
+.zfocus{font-size:22px;color:#fff;background:#222;padding:2px 8px}
+.zblurb{font-size:22px;color:#aaa;margin:6px 0 10px}
+.nodes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.node{border:2px solid #444;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;background:#0b0b0b}
+.node:active{background:#1a1a1a}
+.node.boss{border-color:#888}
+.node.next{border-color:#ffd23f;animation:pulse 1.2s infinite}
+.node.locked{filter:grayscale(1);opacity:.45}
+.nname{font-size:22px;text-align:center;line-height:1}
+.nstat{font-size:19px}
+.spared{color:#ff7ad9}.beaten{color:#3ce07a}.new{color:#ffd23f}
+.banter{display:flex;align-items:center;gap:12px;border-top:2px solid #333;padding-top:8px;min-height:74px}
+.banter .btext{font-size:24px;flex:1}
+.banter .bname{color:#ffd23f}
+
+/* ---------- stats & settings ---------- */
+.shead{display:flex;align-items:center;gap:14px;padding-bottom:10px;border-bottom:2px solid #333;margin-bottom:10px}
+.title2{font-size:15px;color:#ffd23f}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.sbox{border:2px solid #444;padding:8px 10px}
+.sbox .n{font-family:'Press Start 2P',monospace;font-size:18px;color:#ffd23f;margin-bottom:4px}
+.sbox .l{font-size:20px;color:#aaa}
+.tabs{display:flex;gap:8px;margin:8px 0}
+.tab{font-family:'Press Start 2P',monospace;font-size:13px;border:2px solid #666;color:#aaa;padding:10px 14px}
+.tab.on{border-color:#ffd23f;color:#ffd23f}
+.gridcap{font-size:20px;color:#888;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(17,1fr);gap:2px;max-width:620px}
+.gh{font-size:16px;color:#888;display:flex;align-items:center;justify-content:center;aspect-ratio:1}
+.gh.corner{color:#ffd23f}
+.gc{aspect-ratio:1;border:none;min-width:0}
+.l0{background:#1e1e1e}.l1{background:#a8322d}.l2{background:#c9a227}.l3{background:#2fb36b}
+.gc.sel{outline:3px solid #fff;outline-offset:-1px}
+.cellinfo{font-size:24px;min-height:30px;margin:8px 0;color:#fff}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:20px;color:#aaa;margin:6px 0 14px}
+.legend i{display:inline-block;width:16px;height:16px;vertical-align:-2px;margin-right:5px}
+h3{font-family:'Press Start 2P',monospace;font-size:13px;color:#ffd23f;margin:16px 0 8px}
+.weak{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid #a8322d;padding:4px 10px;font-size:24px}
+.srow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0}
+.srow label{width:170px;font-size:24px;color:#ccc}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.segb{font-size:24px;border:2px solid #666;color:#aaa;padding:6px 12px}
+.segb.on{border-color:#ffd23f;color:#ffd23f}
+.help{font-size:23px;color:#ccc;border:2px solid #333;padding:10px 14px;margin:14px 0;line-height:1.25}
+.help b{color:#ffd23f;font-weight:normal}
+.danger{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.danger .btn{color:#ff6b6b;border-color:#ff6b6b;font-size:12px}
+
+@media (max-height:720px){
+  .enemyArea{min-height:110px}
+  .box{min-height:180px;font-size:26px}
+  .controls{min-height:120px}
+  .mbtn,.key{min-height:54px}
+  .dtext{font-size:26px}
+}
+@media (max-width:560px){
+  .mbtn{font-size:11px}
+  .key{font-size:18px}
+  .pals{display:none}
+  .enemyArea{gap:12px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<div id="dialog"><canvas id="dPortrait"></canvas><div class="dbody"><div id="dName" class="dname"></div><div id="dText" class="dtext"></div></div><div id="dMore" class="more">▼</div></div>
+
+<div id="pause" class="nopass"><div class="pbox"><div class="px yellow">PAUSED</div><button id="resumeBtn" class="btn big">RESUME</button><button id="quitBtn" class="btn">QUIT TO MAP</button><div class="small">Every answer so far is already saved.</div></div></div>
+<div id="flash"></div>
+
+<script>
+'use strict';
+/* =========================================================
+   TIMES & PUNISHMENT — a math-facts RPG
+   Drills multiplication & division facts 0–15.
+   One file, no libraries. Progress saves in localStorage.
+
+   How it's organized (for curious kids reading the code!):
+     1. Helpers + game clock
+     2. Save data + fact tracking (the "brain" that picks questions)
+     3. Sound effects + music (made from math: frequencies!)
+     4. Pixel-art sprites
+     5. Story content: characters, monsters, dialogue
+     6. UI pieces: dialog boxes, keypad, menus
+     7. Battle system
+     8. Screens: title, map, stats, settings, ending
+   ========================================================= */
+
+/* ---------- 1. helpers ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const rand = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = arr => { for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; };
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const app = $('#app');
+
+// Game clock: stops ticking while paused, so timers and falling bubbles freeze too.
+let paused = false, pauseStart = 0, pausedTotal = 0;
+const gnow = () => (paused ? pauseStart : performance.now()) - pausedTotal;
+function sleep(ms){ return new Promise(res => { const end = gnow() + ms; (function poll(){ if(gnow() >= end) res(); else setTimeout(poll, 30); })(); }); }
+
+/* ---------- 2. save data + fact tracking ---------- */
+const SAVE_KEY = 'tnp_save_v1';
+function defaultSave(){
+  return { name:'', level:1, xp:0, cleared:{}, glitchWins:0, ending:null, stats:{},
+    settings:{ speed:'normal', sound:true, music:true },
+    totals:{ correct:0, wrong:0, battles:0, spared:0, tSum:0, tN:0 } };
+}
+function loadSave(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY));
+    if(s && typeof s === 'object'){
+      const d = defaultSave();
+      return Object.assign(d, s, { settings:Object.assign(d.settings, s.settings||{}), totals:Object.assign(d.totals, s.totals||{}) });
+    }
+  }catch(e){}
+  return defaultSave();
+}
+let S = loadSave();
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){} }
+const fmt = t => String(t).replace(/\{NAME\}/g, S.name || 'Kid');
+
+// Every fact gets a key. 7×8 and 8×7 are the same fact ("m:7,8").
+// Division facts are stored as divisor + answer: 56÷8=7 is "d:8,7".
+const factKeyM = (a,b) => 'm:' + Math.min(a,b) + ',' + Math.max(a,b);
+const factKeyD = (divisor, quotient) => 'd:' + divisor + ',' + quotient;
+
+function record(key, correct, ms){
+  const st = S.stats[key] || (S.stats[key] = { n:0, c:0, streak:0, t:0, lastWrong:false });
+  st.n++;
+  if(correct){
+    st.c++; st.streak++; st.lastWrong = false;
+    st.t = st.t ? Math.round(st.t*0.6 + ms*0.4) : Math.round(ms); // running average of correct-answer time
+    S.totals.correct++; S.totals.tSum += ms; S.totals.tN++;
+  } else {
+    st.streak = 0; st.lastWrong = true; S.totals.wrong++;
+  }
+  save();
+}
+// 0 = never seen, 1 = learning, 2 = getting there, 3 = mastered (3 right in a row, fast)
+function factLevel(key){
+  const st = S.stats[key];
+  if(!st || !st.n) return 0;
+  if(st.streak >= 3 && st.t && st.t < 3500) return 3;
+  if(st.streak >= 2 && st.t < 6000) return 2;
+  return 1;
+}
+// How likely a fact is to be picked. Missed/slow facts come up more; mastered facts rest.
+function factWeight(key){
+  const lv = factLevel(key), st = S.stats[key];
+  let w = [3, 4, 1.6, 0.4][lv];
+  if(st && st.lastWrong) w += 4;
+  return w;
+}
+
+// Build the pool of facts a monster can ask about, from its "focus" numbers.
+function buildPools(E){
+  const weak = E.focus === 'weak';
+  const F = weak ? [2,3,4,5,6,7,8,9,10,11,12,13,14,15] : E.focus;
+  const easyFocus = F.includes(0) || F.includes(1);
+  const poolM = [], poolD = [], seenM = new Set(), seenD = new Set();
+  for(const f of F){
+    for(let x = 0; x <= 15; x++){
+      if(weak && x < 2) continue;
+      const km = factKeyM(f,x);
+      if(!seenM.has(km)){ seenM.add(km); const lo = Math.min(f,x); poolM.push({ a:f, b:x, key:km, triv: lo <= 1 && !F.includes(lo) }); }
+      // the division facts in the same family: (f×x) ÷ f = x  and  (f×x) ÷ x = f
+      if(f > 0){ const kd = factKeyD(f,x); if(!seenD.has(kd)){ seenD.add(kd); poolD.push({ divisor:f, quotient:x, key:kd, triv:(f===1 || x<=1) && !easyFocus }); } }
+      if(x > 0){ const kd = factKeyD(x,f); if(!seenD.has(kd)){ seenD.add(kd); poolD.push({ divisor:x, quotient:f, key:kd, triv:(x===1 || f<=1) && !easyFocus }); } }
+    }
+  }
+  return { poolM, poolD };
+}
+function wpick(pool, recent, weakMode){
+  let total = 0;
+  const ws = pool.map(f => {
+    if(recent.includes(f.key)) return 0;
+    let w = factWeight(f.key) * (f.triv ? 0.2 : 1);
+    if(weakMode) w *= [0.6, 2.5, 1.5, 0.3][factLevel(f.key)];
+    total += w; return w;
+  });
+  if(total <= 0) return pick(pool);
+  let r = Math.random() * total;
+  for(let i = 0; i < pool.length; i++){ r -= ws[i]; if(r <= 0) return pool[i]; }
+  return pool[pool.length-1];
+}
+// Make a question. kind 'm' = multiply, 'd' = divide (sometimes shown as a missing factor: 7 × ? = 56)
+function genQ(B, kind){
+  if(kind === 'm'){
+    const f = wpick(B.poolM, B.recent, B.weak);
+    const [a,b] = Math.random() < 0.5 ? [f.a, f.b] : [f.b, f.a];
+    pushRecent(B, f.key);
+    return { type:'m', a, b, answer:a*b, key:f.key, prompt:`${a} × ${b} = ?`, full:`${a} × ${b} = ${a*b}` };
+  }
+  const f = wpick(B.poolD, B.recent, B.weak);
+  pushRecent(B, f.key);
+  const p = f.divisor * f.quotient, mf = Math.random() < 0.3;
+  return { type: mf ? 'mf' : 'd', divisor:f.divisor, quotient:f.quotient, p, answer:f.quotient, key:f.key,
+    prompt: mf ? `${f.divisor} × ? = ${p}` : `${p} ÷ ${f.divisor} = ?`,
+    full:   mf ? `${f.divisor} × ${f.quotient} = ${p}` : `${p} ÷ ${f.divisor} = ${f.quotient}` };
+}
+function pushRecent(B, k){ B.recent.push(k); if(B.recent.length > 4) B.recent.shift(); }
+function qHTML(q){
+  const A = '<span class="ans">&nbsp;</span>';
+  if(q.type === 'm') return `${q.a} × ${q.b} = ${A}`;
+  if(q.type === 'd') return `${q.p} ÷ ${q.divisor} = ${A}`;
+  return `${q.divisor} × ${A} = ${q.p}`;
+}
+// Wrong answers for the falling bubbles: "near miss" answers are the best practice.
+function distractors(q){
+  const ans = q.answer, out = new Set();
+  let t1, t2;
+  if(q.type === 'm'){ const {a,b} = q; t1 = [a*(b+1), a*(b-1), (a+1)*b, (a-1)*b]; t2 = [ans+1, ans-1, ans+10, ans-10, a+b, ans+2]; }
+  else { t1 = [ans+1, ans-1]; t2 = [ans+2, ans-2, q.divisor, ans+3, ans*2, ans+10]; }
+  const ok = c => Number.isInteger(c) && c >= 0 && c !== ans && !out.has(c);
+  let n1 = 0;
+  for(const c of shuffle(t1.slice())){ if(n1 >= 2) break; if(ok(c)){ out.add(c); n1++; } }
+  for(const c of shuffle(t2.slice())){ if(out.size >= 3) break; if(ok(c)) out.add(c); }
+  let k = 1; while(out.size < 3){ if(ok(ans+k)) out.add(ans+k); k++; }
+  return [...out];
+}
+// Strategy tips shown after a miss. (Teaching the WHY, not just the answer.)
+function multHint(a,b){
+  const big = Math.max(a,b), small = Math.min(a,b), ans = a*b;
+  if(small === 0) return 'Anything × 0 = 0. That is Nullbert’s whole personality.';
+  if(small === 1) return 'Anything × 1 is just itself. Free points!';
+  if(big === 8 && small === 7) return '5, 6, 7, 8 → 56 = 7 × 8';
+  if(big === 10) return `× 10? Stick a 0 on the end: ${small} → ${small}0`;
+  if(big === 11 && small <= 9) return `11 × a single digit? Just repeat it: ${small}${small}`;
+  if(big > 10){ const r = big-10; return `Split it! ${big} × ${small} = 10×${small} + ${r}×${small} = ${10*small} + ${r*small} = ${ans}`; }
+  if(big === 9) return `9 × ${small} = 10×${small} − ${small} = ${10*small} − ${small} = ${ans}`;
+  if(small === 2) return `× 2 is just doubling: ${big} + ${big} = ${ans}`;
+  if(big === 5 || small === 5){ const o = big === 5 ? small : big; return `× 5 is half of × 10: ${o*10} ÷ 2 = ${ans}`; }
+  if(big > 5){ const r = big-5; return `Split it! ${big} × ${small} = 5×${small} + ${r}×${small} = ${5*small} + ${r*small} = ${ans}`; }
+  return `${big} × ${small} = ${ans}. Say it three times fast!`;
+}
+function hintFor(q){
+  if(q.type === 'm') return multHint(q.a, q.b);
+  if(q.p === 0) return '0 ÷ anything = 0. Splitting up nothing still gives nothing.';
+  let h = `Fact family! Think “${q.divisor} × what = ${q.p}?” → ${q.divisor} × ${q.quotient} = ${q.p}`;
+  if(Math.max(q.divisor, q.quotient) > 10 && Math.min(q.divisor, q.quotient) > 1) h += '<br>' + multHint(q.divisor, q.quotient);
+  return h;
+}
+
+/* ---------- 3. sound + music (all synthesized, no files) ---------- */
+const A = { ctx:null };
+function audioInit(){
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC) return;
+  if(!A.ctx){
+    A.ctx = new AC();
+    A.master = A.ctx.createGain(); A.master.gain.value = 0.6; A.master.connect(A.ctx.destination);
+    A.sfx = A.ctx.createGain(); A.sfx.gain.value = 0.8; A.sfx.connect(A.master);
+    A.mus = A.ctx.createGain(); A.mus.gain.value = 0.5; A.mus.connect(A.master);
+    const len = Math.floor(A.ctx.sampleRate * 0.3);
+    A.noise = A.ctx.createBuffer(1, len, A.ctx.sampleRate);
+    const d = A.noise.getChannelData(0); for(let i = 0; i < len; i++) d[i] = Math.random()*2 - 1;
+    if(M.want) startMusic(M.want);
+  }
+  if(A.ctx.state === 'suspended') A.ctx.resume();
+}
+window.addEventListener('pointerdown', audioInit, true);
+window.addEventListener('keydown', audioInit, true);
+
+function tone(f, dur, o={}){
+  if(!A.ctx) return;
+  const { type='square', vol=0.15, when=0, slide=0, dest } = o;
+  const t = A.ctx.currentTime + Math.max(0, when);
+  const osc = A.ctx.createOscillator(), g = A.ctx.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(f, t);
+  if(slide) osc.frequency.exponentialRampToValueAtTime(Math.max(30, f*slide), t+dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0008, t+dur);
+  osc.connect(g); g.connect(dest || A.sfx); osc.start(t); osc.stop(t + dur + 0.03);
+}
+function noise(dur, vol=0.3){
+  if(!A.ctx) return;
+  const t = A.ctx.currentTime, s = A.ctx.createBufferSource(), g = A.ctx.createGain(), f = A.ctx.createBiquadFilter();
+  s.buffer = A.noise; f.type = 'lowpass'; f.frequency.value = 1800;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+  s.connect(f); f.connect(g); g.connect(A.sfx); s.start(t); s.stop(t+dur);
+}
+const sfxOn = () => A.ctx && S.settings.sound;
+const arp = (notes, step, o) => notes.forEach((f,i) => tone(f, o.dur||0.1, Object.assign({}, o, { when:i*step })));
+const sfx = {
+  blip(p=260){ if(sfxOn()) tone(p, 0.04, { vol:0.05 }); },
+  tick(){ if(sfxOn()) tone(880, 0.03, { vol:0.06, type:'triangle' }); },
+  select(){ if(sfxOn()) arp([660,990], 0.05, { vol:0.09, dur:0.06 }); },
+  correct(){ if(sfxOn()) arp([523,659,784], 0.06, { vol:0.11, dur:0.09 }); },
+  crit(){ if(sfxOn()) arp([523,659,784,1047], 0.05, { vol:0.12 }); },
+  wrong(){ if(sfxOn()) tone(220, 0.25, { vol:0.13, slide:0.5, type:'sawtooth' }); },
+  hit(){ if(sfxOn()){ noise(0.18, 0.35); tone(140, 0.15, { vol:0.15, slide:0.4 }); } },
+  hurt(){ if(sfxOn()){ noise(0.25, 0.4); tone(300, 0.2, { vol:0.14, slide:0.3, type:'sawtooth' }); } },
+  heal(){ if(sfxOn()) arp([392,523,659,784], 0.07, { vol:0.1, type:'triangle', dur:0.12 }); },
+  mercy(){ if(sfxOn()) arp([784,988,1175], 0.07, { vol:0.09, type:'triangle', dur:0.12 }); },
+  levelup(){ if(sfxOn()) arp([523,659,784,1047,784,1047], 0.09, { vol:0.11, dur:0.12 }); },
+  win(){ if(sfxOn()) arp([392,523,659,784,659,784,1047], 0.1, { vol:0.11, dur:0.14 }); },
+  lose(){ if(sfxOn()) arp([392,330,262,196], 0.22, { vol:0.13, type:'triangle', dur:0.3 }); },
+};
+
+// Music: each note is a MIDI number. Frequency = 440 × 2^((n−69)/12). That's math!
+const midi = n => 440 * Math.pow(2, (n-69)/12);
+const R = null; // rest (in bass patterns)
+function bassLine(roots, pat){ const out = []; roots.forEach(r => pat.forEach(p => out.push(p === null ? 0 : r+p))); return out; }
+const SONGS = {
+  map: { bpm:92, leadVol:0.045,
+    bass: bassLine([45,41,48,43], [0,R,R,R,12,R,R,R,7,R,R,R,12,R,7,R]),
+    lead: [76,0,0,0,74,0,72,0,69,0,0,0,72,0,74,0,  72,0,0,0,69,0,0,0,65,0,69,0,72,0,0,0,
+           67,0,72,0,76,0,0,0,79,0,76,0,74,0,72,0,  74,0,0,0,71,0,0,0,67,0,0,0,0,0,0,0] },
+  battle: { bpm:150, leadVol:0.05,
+    bass: bassLine([45,45,41,43,45,45,41,40], [0,R,12,R,0,R,12,R,0,R,12,R,0,R,12,R]),
+    lead: [69,0,69,0,72,0,69,0,76,0,0,0,74,0,72,0,  69,0,0,0,67,0,69,0,72,0,0,0,0,0,0,0,
+           65,0,65,0,69,0,65,0,72,0,0,0,71,0,69,0,  67,0,0,0,71,0,74,0,79,0,0,0,77,0,76,0,
+           69,0,69,0,72,0,69,0,76,0,0,0,79,0,81,0,  81,0,79,0,76,0,74,0,72,0,0,0,0,0,0,0,
+           77,0,76,0,74,0,72,0,74,0,0,0,72,0,71,0,  68,0,0,0,71,0,0,0,76,0,0,0,0,0,0,0] },
+};
+SONGS.boss = { bpm:166, leadVol:0.05, bass:SONGS.battle.bass.map(n => n ? n+5 : 0), lead:SONGS.battle.lead.map(n => n ? n+5 : 0) };
+const M = { want:null, song:null, step:0, next:0, timer:null };
+function music(name){ M.want = name; if(!A.ctx) return; if(M.song === name) return; startMusic(name); }
+function startMusic(name){
+  clearInterval(M.timer); M.timer = null; M.song = name;
+  if(!name || !A.ctx) return;
+  M.step = 0; M.next = A.ctx.currentTime + 0.08;
+  M.timer = setInterval(schedMusic, 25);
+}
+function schedMusic(){
+  const s = SONGS[M.song]; if(!s || !A.ctx) return;
+  const spb = 60 / s.bpm / 4; // seconds per 16th note
+  if(M.next < A.ctx.currentTime - 0.2) M.next = A.ctx.currentTime + 0.05;
+  while(M.next < A.ctx.currentTime + 0.15){
+    if(S.settings.music && !paused){
+      const when = M.next - A.ctx.currentTime, i = M.step;
+      const b = s.bass[i % s.bass.length]; if(b) tone(midi(b), spb*1.7, { type:'triangle', vol:0.2, when, dest:A.mus });
+      const l = s.lead[i % s.lead.length]; if(l) tone(midi(l), spb*1.5, { type:'square', vol:s.leadVol, when, dest:A.mus });
+    }
+    M.next += spb; M.step++;
+  }
+}
+
+/* ---------- 4. sprites ---------- */
+// Hand-drawn pixel art: each letter is a color, '.' is see-through.
+const SPRITES = {
+  hero: { pal:{ h:'#6b4226', s:'#f5c9a0', e:'#141414', m:'#b5523b', b:'#3d74e0', y:'#ffd23f', p:'#2f3550', o:'#e8e8e8' }, rows:[
+    ".....hhhhhh.....",
+    "...hhhhhhhhhh...",
+    "..hhhhhhhhhhhh..",
+    "..hhsssssssshh..",
+    "..hssessssessh..",
+    "..hssessssessh..",
+    "...ssssssssss...",
+    "....sssmmsss....",
+    ".....ssssss.....",
+    "...bbbbbbbbbb...",
+    "..bbbbbyybbbbb..",
+    ".sbbbbbyybbbbbs.",
+    ".s.bbbbbbbbbb.s.",
+    "...pppppppppp...",
+    "...ppp....ppp...",
+    "..ooo......ooo.."]},
+  remy: { pal:{ P:'#8e6ad8', l:'#cdb8ff', w:'#ffffff', k:'#141414', d:'#5b3ea0' }, rows:[
+    "................",
+    "................",
+    "................",
+    "......PPPP......",
+    "....PPPPPPPP....",
+    "...PPPPPPPPPP...",
+    "..PPllPPPPPPPP..",
+    "..PPlPwwPPwwPP..",
+    ".PPPPPwkPPwkPPP.",
+    ".PPPPPPPPPPPPPP.",
+    ".PPPPPPkkPPPPPP.",
+    ".PPPPPkPPkPPPPP.",
+    "..PPPPPPPPPPPP..",
+    "...PPPPPPPPPP...",
+    "....dd....dd....",
+    "................"]},
+  nullbert: { pal:{ r:'#e0403a', O:'#f0a830', Y:'#ffe08a', w:'#ffffff', k:'#141414', d:'#a8701a' }, rows:[
+    "......rrrr......",
+    ".......rr.......",
+    ".....OOOOOO.....",
+    "...OYYOOOOOOO...",
+    "..OOOOOOOOOOOO..",
+    ".OOwkOOOOOOwkOO.",
+    ".OOOOOOkkOOOOOO.",
+    "OOOO........OOOO",
+    "OOO..........OOO",
+    "OOO..........OOO",
+    "OOOO........OOOO",
+    ".OOOOO....OOOOO.",
+    "..OOOOOOOOOOOO..",
+    "...OOOOOOOOOO...",
+    ".....OOOOOO.....",
+    "....dd....dd...."]},
+  divider: { pal:{ y:'#ffd23f', v:'#7a3cc0', V:'#b48cff', R:'#ff3030', w:'#ffffff', k:'#141414' }, rows:[
+    "y.y.y...........",
+    "yyyyy...........",
+    "vvvvvvvvvvvvvvvv",
+    "vVVVVVVVVVVVVVVv",
+    ".vvv............",
+    "..vvv..RR...RR..",
+    "...vvv.RR...RR..",
+    "...vvv..........",
+    "....vvv.wkwkwk..",
+    "...vvv..........",
+    "...vvv..........",
+    "..vvv...........",
+    ".vvv............",
+    "vvv.............",
+    "................",
+    "................"]},
+};
+const spriteCache = {};
+function spriteCanvas(id){
+  if(spriteCache[id]) return spriteCache[id];
+  const sp = SPRITES[id], c = document.createElement('canvas');
+  c.width = sp.rows[0].length; c.height = sp.rows.length;
+  const x = c.getContext('2d');
+  sp.rows.forEach((row, y) => [...row].forEach((ch, xx) => { if(sp.pal[ch]){ x.fillStyle = sp.pal[ch]; x.fillRect(xx, y, 1, 1); } }));
+  return spriteCache[id] = c;
+}
+// Monsters are emoji drawn tiny, then blown up with no smoothing = instant pixel art.
+const emojiCache = {};
+function emojiSprite(emoji, px=22){
+  const key = emoji + px;
+  if(emojiCache[key]) return emojiCache[key];
+  const c = document.createElement('canvas'); c.width = c.height = px;
+  const x = c.getContext('2d');
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = `${Math.floor(px*0.82)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  x.fillText(emoji, px/2, px/2 + 1);
+  try{
+    const d = x.getImageData(0, 0, px, px);
+    for(let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 110 ? 255 : 0;
+    x.putImageData(d, 0, 0);
+  }catch(e){}
+  return emojiCache[key] = c;
+}
+function srcFor(thing){
+  if(typeof thing === 'string') return spriteCanvas(thing);
+  if(thing.sprite) return spriteCanvas(thing.sprite);
+  return emojiSprite(thing.emoji);
+}
+function paint(cv, thing, size){
+  if(!cv) return;
+  const src = srcFor(thing), scale = Math.max(1, Math.floor(size / src.width));
+  cv.width = src.width * scale; cv.height = src.height * scale;
+  const x = cv.getContext('2d'); x.imageSmoothingEnabled = false;
+  x.clearRect(0, 0, cv.width, cv.height); x.drawImage(src, 0, 0, cv.width, cv.height);
+}
+
+/* ---------- 5. story content ---------- */
+const SPEAKERS = {
+  remy: { name:'REMY', sprite:'remy', pitch:170 },
+  null: { name:'NULLBERT', sprite:'nullbert', pitch:520 },
+  hero: { name:null, sprite:'hero', pitch:330 },
+  narr: { name:'', sprite:null, pitch:240 },
+};
+
+const ENEMIES = {
+  binarat: { name:'BINARAT', emoji:'🐀', focus:[0,1,10], pitch:600,
+    desc:'Only knows 1 and 0. Thinks that is plenty.',
+    intro:'* BINARAT scurries in! 01001000 01001001!',
+    pre:[{w:'remy',t:'First monster. A Binarat. Easy one. Quick lesson:'},
+         {w:'remy',t:'FIGHT = multiplication. Type the answer. Faster answers hit HARDER.'},
+         {w:'remy',t:'ACT = division. Get it right and the monster starts to like you. Fill the MERCY bar, then SPARE it.'},
+         {w:'null',t:'When it attacks, tap the RIGHT answer before it hits the floor! Or get bonked. Educationally.'},
+         {w:'remy',t:'SNACK heals you. And if you miss a fact, I will show you a trick for it. Ready?'}],
+    acts:[{n:'Count in binary',t:'* You count to ten in binary: “1, 10, 11, 100...” Binarat sheds a single tear.'},
+          {n:'Offer cheese',t:'* You offer cheese. Binarat checks if it is 1 cheese or 0 cheese. It is 1. Joy.'}],
+    quips:['* Binarat flips all your bits!','* Binarat chews through your homework!','* Binarat squeaks in hexadecimal. Rude.'],
+    spare:'* Binarat squeaks “1” (which means YES) and scurries off.',
+    win:{w:'null',t:'Ha! You turned that rat into a ZERO. My favorite number.'} },
+  parrot: { name:'PARROT PARROT', emoji:'🦜', focus:[2,10], pitch:700,
+    desc:'Repeats everything twice twice. Doubling is its whole personality personality.',
+    intro:'* PARROT PARROT swoops in! It squawks twice. Twice.',
+    pre:[{w:'remy',t:'Parrot Parrot. It doubles everything it hears.'},
+         {w:'null',t:'Doubles everything? Then double ME! Zero times two is... ZERO! Still perfect!'}],
+    acts:[{n:'Say “hello”',t:'* You say hello. It says HELLO HELLO. You made a friend friend.'},
+          {n:'Teach it a word',t:'* You teach it “PARALLELOGRAM.” It is thrilled thrilled.'}],
+    quips:['* Parrot Parrot dive-bombs you! Twice!','* Parrot Parrot repeats your worst mistake. Twice.','* Feathers everywhere. Everywhere.'],
+    spare:'* Parrot Parrot flies away happy happy.',
+    win:{w:'remy',t:'Two down. Well, one down. It just felt like two.'} },
+  decapod: { name:'SIR DECAPOD', emoji:'🦀', focus:[10,2,0,1], boss:true, pitch:200,
+    desc:'A crab with TEN legs. Counts on them. Constantly.',
+    intro:'* SIR DECAPOD clacks his claws! “BEHOLD MY TEN LEGS!”',
+    pre:[{w:'enemy',t:'I am SIR DECAPOD, guardian of the swamp! I have TEN legs! TEN!'},
+         {w:'remy',t:'We get it. You have ten legs.'},
+         {w:'enemy',t:'Count them. I DARE you.'}],
+    acts:[{n:'Count his legs',t:'* You count all 10 legs. Nobody has ever done this. He is overwhelmed.'},
+          {n:'Walk sideways',t:'* You walk sideways like a crab. Sir Decapod respects the hustle.'}],
+    quips:['* Sir Decapod pinches with all ten... wait, those are legs.','* Sir Decapod scuttles at you sideways!','* “ADD A ZERO!” he yells, for no reason.'],
+    spare:'* Sir Decapod salutes you with all 10 legs and scuttles into the sunset. Sideways.',
+    win:{w:'null',t:'The swamp is clear! Onward to... a mall? Why is there a mall?'} },
+
+  trihard: { name:'TRI-HARD', emoji:'🔺', focus:[3], pitch:420,
+    desc:'A triangle who tries WAY too hard. Three sides. Zero chill.',
+    intro:'* TRI-HARD bursts in doing jumping jacks!',
+    pre:[{w:'enemy',t:'HEY! HEY! Watch me do 3 push-ups! Then 33! Then 333!'},{w:'remy',t:'Please do not.'}],
+    acts:[{n:'Tell it to chill',t:'* You tell Tri-Hard to chill. It tries REALLY hard to chill. It is sweating.'},
+          {n:'Cheer it on',t:'* You cheer! Tri-Hard does 33 push-ups and cries happy tears.'}],
+    quips:['* Tri-Hard pokes you with its pointy corners!','* Tri-Hard yells “ACUTE ATTACK!” It is very proud of that one.','* Tri-Hard tries too hard. You take damage from the vibes.'],
+    spare:'* Tri-Hard finally relaxes. It is now a Tri-Easy.',
+    win:{w:'remy',t:'Three sides and not one of them was chill.'} },
+  clover: { name:'FOUR-LEAF CLOBBER', emoji:'🍀', focus:[4], pitch:360,
+    desc:'Claims to be lucky. Is not. Has never won anything.',
+    intro:'* FOUR-LEAF CLOBBER wants to fight! It feels lucky!',
+    pre:[{w:'enemy',t:'Four leaves means FOUR TIMES the luck! Prepare to lose!'},
+         {w:'null',t:'Four times zero luck is still... oh. Oh no. That is sad.'}],
+    acts:[{n:'Make a wish',t:'* You make a wish on its leaves. It blushes an even greener green.'},
+          {n:'Water it',t:'* You water it gently. It perks up. It has never felt so loved.'}],
+    quips:['* Four-Leaf Clobber slaps you with four leaves!','* Clobber throws a horseshoe! It misses what it was aiming at. It hits you instead.','* Clobber does a four-leaf spin attack!'],
+    spare:'* Four-Leaf Clobber decides its luck is better spent elsewhere.',
+    win:{w:'null',t:'Lucky for US, anyway!'} },
+  highfive: { name:'HIGH FIVE', emoji:'✋', focus:[5,3,4], boss:true, pitch:150,
+    desc:'A GIANT hand that just wants a high five. You have left it hanging for YEARS.',
+    intro:'* HIGH FIVE rises from the food court! It is... waiting.',
+    pre:[{w:'enemy',t:'...'},{w:'enemy',t:'......'},{w:'remy',t:'It wants a high five, {NAME}.'},{w:'enemy',t:'FIVE YEARS. FIVE YEARS I HAVE BEEN LEFT HANGING.'}],
+    acts:[{n:'High five it',t:'* SMACK! A perfect high five. Somewhere, a crowd cheers.'},
+          {n:'Air guitar',t:'* You play air guitar. High Five plays air guitar back. It has 5 fingers. It is better than you.'},
+          {n:'Leave it hanging',t:'* You leave it hanging. It is devastated. ...Wow. That was cold.', joke:true}],
+    quips:['* High Five tries to high five you. At 500 miles per hour!','* High Five snaps its fingers! The floor is lava now!','* High Five gives you a thumbs down. Emotional damage!'],
+    spare:'* High Five finally got its high five. It waves goodbye with all five fingers.',
+    win:{w:'remy',t:'Next stop: the Lunchroom of the Sixth Dimension. I hear the tacos are cursed.'} },
+
+  buzzhex: { name:'BUZZ HEX', emoji:'🐝', focus:[6], pitch:800,
+    desc:'Obsessed with hexagons. Every room in its house has 6 walls. Its friends find this exhausting.',
+    intro:'* BUZZ HEX buzzes in! Bzz bzz bzz bzz bzz bzz. (That was 6.)',
+    pre:[{w:'enemy',t:'Bzz! Did you know a hexagon has SIX sides? Did you know? Did you KNOW?'},
+         {w:'null',t:'I have NO sides. I am a circle. Checkmate.'}],
+    acts:[{n:'Praise hexagons',t:'* You say hexagons are the best shape. Buzz Hex does a happy little dance.'},
+          {n:'Offer honey',t:'* You offer honey. It was already Buzz Hex’s honey. Awkward. But sweet.'}],
+    quips:['* Buzz Hex swarms you with six stingers!','* Buzz Hex lectures you about hexagons for six minutes!','* BZZZZZZ!'],
+    spare:'* Buzz Hex flies off to tell its 6 friends about you.',
+    win:{w:'remy',t:'Bees. Why did it have to be bees.'} },
+  seven: { name:'SEVEN', emoji:'7️⃣', focus:[7], pitch:260,
+    desc:'Seven ate nine. Nobody talks about it.',
+    intro:'* SEVEN appears! It smells... like nine.',
+    pre:[{w:'remy',t:'Careful. That is Seven. It ATE Nine.'},
+         {w:'enemy',t:'I do not know what you are talking about. *burp*'},
+         {w:'null',t:'Why was six afraid of seven? BECAUSE—'},
+         {w:'remy',t:'Nullbert, we KNOW.'}],
+    acts:[{n:'Ask about Nine',t:'* Seven sweats nervously. “Nine who? Never met a nine.” It burps.'},
+          {n:'Offer a snack',t:'* You offer a snack. Seven eats it. And the plate. And the table. It looks happier.'}],
+    quips:['* Seven tries to eat YOU!','* Seven throws lucky 7s! They are not lucky for you.','* Seven chomps!'],
+    spare:'* Seven waddles away, full. It promises to only eat salad from now on.',
+    win:{w:'null',t:'Nine has been avenged!'} },
+  octopal: { name:'OCTO-PAL', emoji:'🐙', focus:[8], pitch:480,
+    desc:'Has 8 arms. Wants to hug you with ALL of them. Personal space: 0.',
+    intro:'* OCTO-PAL wants a hug! Eight of them, actually.',
+    pre:[{w:'enemy',t:'HUGS! HUGS FOR EVERYONE! EIGHT HUGS EACH!'},{w:'remy',t:'Do not let it hug you. It does not let go.'}],
+    acts:[{n:'Accept one hug',t:'* You allow ONE hug. Octo-Pal uses all 8 arms anyway. It is actually kind of nice.'},
+          {n:'Set boundaries',t:'* You explain personal space. Octo-Pal takes notes. With 8 pens.'}],
+    quips:['* Octo-Pal throws 8 hugs at you!','* Octo-Pal squirts ink! It is scented!','* Octo-Pal does the wave. With all 8 arms.'],
+    spare:'* Octo-Pal waves goodbye. You get 8 high fives on the way out.',
+    win:{w:'null',t:'That was the most aggressive friendship I have ever seen.'} },
+  ninelives: { name:'NINE LIVES', emoji:'🐈‍⬛', focus:[9,6,7,8], boss:true, pitch:330,
+    desc:'A cat on its 9th and FINAL life. Very careful now. Wears a helmet.',
+    intro:'* NINE LIVES lands on its feet! It always does.',
+    pre:[{w:'enemy',t:'I have used eight of my nine lives. Do you know how stressful that is?'},
+         {w:'remy',t:'What happened to the other eight?'},
+         {w:'enemy',t:'We do not talk about Seven.'},
+         {w:'null',t:'Seven strikes again...'}],
+    acts:[{n:'Pet it',t:'* You pet Nine Lives. It purrs at 9 decibels. Then 99.'},
+          {n:'Laser pointer',t:'* You wave a laser pointer. Nine Lives completely forgets the fight.'}],
+    quips:['* Nine Lives scratches! Nine times!','* Nine Lives knocks your stuff off the table. On purpose. While looking at you.','* Nine Lives coughs up a hairball shaped like a 9!'],
+    spare:'* Nine Lives curls up in a sunbeam and naps. Battle over. Cat wins, technically.',
+    win:{w:'remy',t:'Onward. The Dozen Dungeon is next. It smells like muffins.'} },
+
+  elevenator: { name:'ELEVENATOR', emoji:'🛗', focus:[11], pitch:300,
+    desc:'An elevator that only stops on floors 11, 22, 33... The music never ends.',
+    intro:'* DING! The ELEVENATOR doors open! Smooth jazz plays.',
+    pre:[{w:'enemy',t:'Going up? I stop at floors 11, 22, 33, 44... Which floor, please?'},
+         {w:'remy',t:'We want floor 1.'},
+         {w:'enemy',t:'I am sorry. That is not a multiple of 11.'}],
+    acts:[{n:'Press all buttons',t:'* You press every button. The Elevenator is horrified. Then impressed.'},
+          {n:'Hum along',t:'* You hum the elevator music. The Elevenator feels SEEN.'}],
+    quips:['* The Elevenator doors close on you! Ding!','* The elevator music gets LOUDER!','* The Elevenator drops 11 floors at once!'],
+    spare:'* DING! The Elevenator takes you to floor 0. Nullbert is delighted.',
+    win:{w:'null',t:'Floor ZERO. My floor. Fabulous.'} },
+  baker: { name:'THE DOZEN BAKER', emoji:'🧁', focus:[12,11], boss:true, pitch:240,
+    desc:'Bakes everything in dozens. Once gave someone 13. Still will not talk about it.',
+    intro:'* THE DOZEN BAKER bursts out of the oven! It smells amazing!',
+    pre:[{w:'enemy',t:'Welcome to my dungeon bakery! Everything comes in TWELVES!'},
+         {w:'null',t:'Can I have zero muffins?'},
+         {w:'enemy',t:'...That is not a dozen of anything!'},
+         {w:'remy',t:'Ask him about the baker’s dozen.'},
+         {w:'enemy',t:'WE DO NOT SPEAK OF THIRTEEN.'}],
+    acts:[{n:'Compliment muffins',t:'* You compliment the muffins. The Dozen Baker gives you 12 more. You put them... somewhere.'},
+          {n:'Ask for 13',t:'* You ask for a baker’s dozen. His eye twitches. But... he does it. Growth.'}],
+    quips:['* The Dozen Baker throws 12 hot muffins at you!','* Flour cloud! You cannot see!','* The Dozen Baker rolls you flat with a rolling pin!'],
+    spare:'* The Dozen Baker packs you a dozen muffins for the road. Okay, thirteen.',
+    win:{w:'remy',t:'The Teen Spire is next. 13, 14, 15. The Great Divider is waiting at the top.'} },
+
+  thirteen: { name:'UNLUCKY 13', emoji:'🪞', focus:[13], pitch:280,
+    desc:'A cracked mirror. Seven years of bad luck, and it is only on year one.',
+    intro:'* UNLUCKY 13 appears! A black cat walks by. A ladder falls over.',
+    pre:[{w:'enemy',t:'Nobody wants floor 13. Nobody wants seat 13. NOBODY WANTS ME.'},{w:'remy',t:'...Oh no. I relate to this.'}],
+    acts:[{n:'Tell it a secret',t:'* You whisper: “13 is a prime number. That is actually cool.” Unlucky 13 is stunned.'},
+          {n:'Knock on wood',t:'* You knock on wood. Somehow this helps. Its cracks look smaller.'}],
+    quips:['* Unlucky 13 reflects your mistakes back at you!','* A ladder falls on you. Unlucky!','* Unlucky 13 spills salt everywhere!'],
+    spare:'* Unlucky 13 feels lucky for the first time. Remy gives it a fist bump.',
+    win:{w:'remy',t:'For the record, I think thirteen is fine.'} },
+  karat: { name:'14 KARAT', emoji:'💍', focus:[14], pitch:620,
+    desc:'Pure gold. Very rich. Has never done its own math. Has a butler for that.',
+    intro:'* 14 KARAT sparkles in! Ugh. So shiny.',
+    pre:[{w:'enemy',t:'Do you KNOW how much I am worth? Neither do I. My butler does the math.'},
+         {w:'null',t:'I am worth ZERO and I have NEVER been happier.'}],
+    acts:[{n:'Do its math',t:'* You do 14 Karat’s math for free. It has never seen such kindness.'},
+          {n:'Polish it',t:'* You polish 14 Karat. It gleams. It says “thank you” for the first time ever.'}],
+    quips:['* 14 Karat blinds you with BLING!','* 14 Karat throws coins at you! Rude AND expensive!','* 14 Karat calls its butler. The butler attacks!'],
+    spare:'* 14 Karat leaves you a big tip and rolls away.',
+    win:{w:'null',t:'Fourteen karats. Zero manners.'} },
+  famous: { name:'FAMOUS FIFTEEN', emoji:'🤳', focus:[15,13,14], boss:true, pitch:450,
+    desc:'Wants 15 minutes of fame. Has been livestreaming this fight the whole time.',
+    intro:'* FAMOUS FIFTEEN is LIVE! 15 viewers watching!',
+    pre:[{w:'enemy',t:'Hey fam!! It is ya boy FIFTEEN! Today we are fighting some random kid!'},
+         {w:'remy',t:'Is it... filming us?'},
+         {w:'enemy',t:'Smash that like button! Let us get this to 15 likes!'},
+         {w:'null',t:'Hi Mom!'}],
+    acts:[{n:'Like & subscribe',t:'* You like and subscribe. Famous Fifteen is overjoyed. 16 viewers now!'},
+          {n:'Ignore the camera',t:'* You ignore the camera. Famous Fifteen realizes real friends do not need views.'}],
+    quips:['* Famous Fifteen blasts you with a ring light!','* Famous Fifteen does a TREND at you!','* Famous Fifteen reads your mean comments out loud!'],
+    spare:'* Famous Fifteen ends the stream. “Thanks for watching, fam.” It walks off, happier.',
+    win:{w:'remy',t:'This is it. The top of the spire. The Great Divider.'} },
+
+  divider: { name:'THE GREAT DIVIDER', sprite:'divider', focus:[2,3,4,5,6,7,8,9,11,12,13,14,15], boss:true, final:true, pitch:110,
+    desc:'Wants to split EVERYTHING in half. Pizzas. Friendships. The Wi-Fi.',
+    intro:'* THE GREAT DIVIDER looms over you!',
+    pre:[{w:'enemy',t:'So. The little Remainder brought friends.'},
+         {w:'remy',t:'Hey, Divider.'},
+         {w:'enemy',t:'I will split this world into perfect, equal pieces. No leftovers. NO REMAINDERS.'},
+         {w:'null',t:'And the Wi-Fi?!'},
+         {w:'enemy',t:'ESPECIALLY the Wi-Fi.'},
+         {w:'null',t:'MONSTER!'}],
+    acts:[{n:'Talk to it',t:'* You tell the Divider that not everything has to split evenly. It hesitates.'},
+          {n:'Let Remy speak',t:'* Remy: “Being left over is not a bad thing. It just means you are... extra.” The Divider flinches.'},
+          {n:'Share a pizza',t:'* You offer the Divider a slice. Not half. Just a slice. It is very confused.'}],
+    quips:['* The Great Divider splits the room in two!','* The Great Divider casts LONG DIVISION! It takes forever!','* “THERE WILL BE NO REMAINDERS!”','* The Great Divider divides your attention!'],
+    phase2:[{w:'enemy',t:'Why... why do you keep getting the answers RIGHT?!'},
+            {w:'remy',t:'Because we practiced. That is it. That is the whole secret.'},
+            {w:'null',t:'Also because I am incredible. But mostly the practicing.'}],
+    spare:'* The Great Divider slowly lowers its bracket...' },
+
+  glitch: { name:'GLITCH GREMLIN', emoji:'👾', focus:'weak', pitch:900,
+    desc:'Made of every fact you ever missed. Gets weaker every time you nail one.',
+    intro:'* A GLITCH GREMLIN crawls out of the pit! It knows your weak spots.',
+    pre:[{w:'remy',t:'The Glitch Pit. It is made of every fact you have ever missed.'},
+         {w:'null',t:'Beat it enough and those facts stop being weak. SCIENCE!'}],
+    acts:[{n:'Debug it',t:'* You debug the Gremlin. Three bugs fall out. Gross.'},
+          {n:'Turn it off and on',t:'* You turn it off and on again. It is... working better?'}],
+    quips:['* The Glitch Gremlin throws your old mistakes at you!','* ERR0R! ERR0R! ERR0R!','* The Gremlin scrambles the screen! (Not really. But scary.)'],
+    spare:'* The Glitch Gremlin crawls back into the pit. For now.',
+    win:{w:'remy',t:'Weak spots: getting less weak.'} },
+};
+for(const k in ENEMIES) ENEMIES[k].id = k;
+
+const ZONES = [
+  { name:'The Floppy Disk Swamp', blurb:'Soggy. Ancient. Smells like 1997.', fights:['binarat','parrot','decapod'], color:'#41c47b' },
+  { name:'Threeville Shopping Maul', blurb:'A haunted mall. Everything is 3 for $4.', fights:['trihard','clover','highfive'], color:'#4fa8ff' },
+  { name:'Lunchroom of the Sixth Dimension', blurb:'The tacos are cursed. The milk is chunky.', fights:['buzzhex','seven','octopal','ninelives'], color:'#ff9a3c' },
+  { name:'The Dozen Dungeon', blurb:'A dungeon. But also a bakery. Smells like muffins and fear.', fights:['elevenator','baker'], color:'#e36bff' },
+  { name:'The Teen Spire', blurb:'Moody. Dramatic. Plays loud music. 13, 14, 15.', fights:['thirteen','karat','famous'], color:'#ff4f6d' },
+  { name:'The Top of the Spire', blurb:'The Great Divider waits. Every fact, 2 through 15.', fights:['divider'], color:'#b48cff' },
+];
+const ORDER = ZONES.flatMap(z => z.fights);
+
+const INTRO = [
+  {t:'It was a normal Tuesday.'},
+  {t:'{NAME} was doing math homework. Problem 37: 14 × 13.'},
+  {t:'{NAME} sighed so hard that the calculator made a weird noise.'},
+  {t:'BZZZT.', fx:'glitch'},
+  {t:'...The kitchen was gone. Everything was dark. Somewhere, a number was screaming.'},
+  {w:'remy', t:'...Oh great. Another one.', show:'remy'},
+  {w:'remy', t:'Welcome to the NUMBERVERSE. I am Remy. I am a Remainder.'},
+  {w:'remy', t:'I am what is left over when stuff does not divide evenly. Do not make it weird.'},
+  {w:'null', t:'HALT! Who dares enter the Numberverse without my permission?!', show:'nullbert'},
+  {w:'remy', t:'Nobody needs your permission, Nullbert.'},
+  {w:'null', t:'I am SIR NULLBERT, the mighty ZERO! Anything multiplied by me becomes NOTHING!'},
+  {w:'null', t:'Fear me! ...Or clap. Clapping is also fine.'},
+  {w:'remy', t:'Here is the deal. THE GREAT DIVIDER took over. He wants to split EVERYTHING in half.'},
+  {w:'remy', t:'Pizzas. Friendships. The Wi-Fi.'},
+  {w:'null', t:'THE WI-FI, {NAME}.'},
+  {w:'remy', t:'The monsters out there have gone feral. Only one thing calms them down... math facts.'},
+  {w:'remy', t:'Climb to the top of the Teen Spire, deal with the Divider, and you can go home.'},
+  {w:'null', t:'And whatever you do... do NOT divide by zero.'},
+  {w:'null', t:'...'},
+  {w:'null', t:'Why is everyone looking at me?'},
+];
+const END_SPARE = [
+  {w:'enemy', t:'...You could have split me in two. Why did you not?'},
+  {w:'remy', t:'Because not everything has to divide evenly. Sometimes there is something left over.'},
+  {w:'remy', t:'And that is okay. Trust me. I am kind of an expert.'},
+  {w:'enemy', t:'Something... left over. Like... a friend?'},
+  {w:'remy', t:'Do not push it.'},
+  {w:'null', t:'THE WI-FI IS BACK! FIVE BARS! FIVE!'},
+];
+const END_FIGHT = [
+  {w:'enemy', t:'Impossible... divided... by a KID?!'},
+  {t:'The Great Divider split into two tiny Dividers. They ran off, arguing about who got the bigger half.'},
+  {w:'remy', t:'...Huh. He finally got his perfect halves.'},
+  {w:'null', t:'THE WI-FI IS BACK! FIVE BARS! FIVE!'},
+];
+const END_COMMON = [
+  {t:'The Numberverse flickered...'},
+  {t:'{NAME} woke up at the kitchen table.'},
+  {t:'The homework was finished. Problem 37: 14 × 13 = 182.'},
+  {t:'In the corner of the calculator screen, a tiny 0 winked.'},
+  {w:'null', t:'...Please clap.'},
+];
+const BANTER = [
+  [{w:'null',t:'Fun fact: anything times me is zero. I am basically a superhero.'}],
+  [{w:'remy',t:'I am not grumpy. I am just... left over.'}],
+  [{w:'null',t:'Remy, divide yourself by me.'},{w:'remy',t:'That is undefined, Nullbert.'},{w:'null',t:'I AM undefined. Undefinable. Unstoppable.'}],
+  [{w:'remy',t:'If we win, maybe I get to be a whole number.'},{w:'null',t:'You are whole to ME, buddy.'},{w:'remy',t:'...Thanks. Weirdo.'}],
+  [{w:'null',t:'Do you ever think about how 1 is just a 0 that stood up?'}],
+  [{w:'remy',t:'Tip: 9 × anything up to 10? The digits add to 9. 9 × 7 = 63, and 6 + 3 = 9.'}],
+  [{w:'remy',t:'Tip: 11 through 15? Split it! 13 × 6 = 10×6 + 3×6 = 60 + 18 = 78.'}],
+  [{w:'null',t:'Tip: × 5 is half of × 10! 5 × 14 = 140 ÷ 2 = 70! I am a GENIUS.'}],
+  [{w:'remy',t:'Tip: division is multiplication backwards. 84 ÷ 7? Think “7 times WHAT is 84?”'}],
+  [{w:'null',t:'Tip: 12 × 12 = 144. That is called a GROSS. Ew.'}],
+  [{w:'remy',t:'Tip: 15 × anything = 10 times it, plus half of that. 15 × 8 = 80 + 40 = 120.'}],
+  [{w:'remy',t:'Tip: 14 × 6? Double 7 × 6! 42 + 42 = 84.'}],
+  [{w:'null',t:'I tried to divide by myself once. I was gone for three days.'}],
+  [{w:'remy',t:'Seven ate nine. Please stop asking me about it.'}],
+  [{w:'null',t:'The Glitch Pit is built from every fact you miss. Beat it to make them stronger!'}],
+];
+const SNACKS = ['a Square Root Beer','a slice of Pi (blueberry)','three-quarters of a sandwich','a Cinnamon Prime Roll','a bowl of Mathcaroni','an Infinity Fry (it never ends)','Nullbert’s Zero-Calorie Donut (it is just the hole)','a Fraction Bar'];
+const IDLE = ['is waiting.','looks at you funny.','is thinking about math. Badly.','is humming a weird song.','smells like a pencil eraser.','does a little dance.','checks its phone.','refuses to blink.','is pretending not to be nervous.'];
+const CRIT_LINES = [{w:'null',t:'CRITICAL! I taught them that.'},{w:'remy',t:'Okay. That was actually cool.'},{w:'null',t:'FAST! Faster than light! Well. Faster than Remy.'},{w:'remy',t:'Speedy. Nice.'}];
+const MISS_LINES = [{w:'remy',t:'Shake it off. Now you know that one.'},{w:'null',t:'Mistakes are just facts you have not met yet!'},{w:'remy',t:'Hey. That trick works every time.'}];
+
+/* ---------- 6. UI pieces ---------- */
+// Typewriter text with little voice blips. Tap to finish instantly.
+function typeText(el, text, pitch=240, speed=24){
+  return new Promise(res => {
+    let i = 0, done = false; el.textContent = '';
+    const t0 = performance.now();
+    const finish = () => { if(done) return; done = true; clearInterval(iv); el.textContent = text; document.removeEventListener('pointerdown', skip, true); window.removeEventListener('keydown', kskip); res(); };
+    const skip = e => { if(paused || (e.target.closest && e.target.closest('.nopass'))) return; if(performance.now() - t0 > 120) finish(); };
+    const kskip = e => { if(e.key === 'Enter' || e.key === ' ') skip(e); };
+    const iv = setInterval(() => { if(paused) return; i++; el.textContent = text.slice(0, i); const ch = text[i-1]; if(i % 2 === 1 && ch && ch.trim()) sfx.blip(pitch); if(i >= text.length) finish(); }, speed);
+    document.addEventListener('pointerdown', skip, true); window.addEventListener('keydown', kskip);
+  });
+}
+// Wait for a tap anywhere (or Enter/Space).
+function onceTap(delay=160){
+  return new Promise(res => {
+    const t0 = performance.now();
+    const h = e => {
+      if(paused || performance.now() - t0 < delay) return;
+      if(e.target && e.target.closest && e.target.closest('.nopass')) return;
+      if(e.type === 'keydown'){ if(!(e.key === 'Enter' || e.key === ' ')) return; e.preventDefault(); }
+      off(); res();
+    };
+    const off = () => { document.removeEventListener('pointerdown', h, true); window.removeEventListener('keydown', h); };
+    document.addEventListener('pointerdown', h, true); window.addEventListener('keydown', h);
+  });
+}
+// Story dialog box with a portrait.
+async function say(lines, enemy, onLine){
+  const ov = $('#dialog'), cv = $('#dPortrait'), nm = $('#dName'), tx = $('#dText'), more = $('#dMore');
+  ov.classList.add('show');
+  for(const L of lines){
+    const who = L.w || 'narr';
+    let name, thing, pitch;
+    if(who === 'enemy'){ name = enemy.name; thing = enemy; pitch = enemy.pitch || 300; }
+    else { const sp = SPEAKERS[who]; name = who === 'hero' ? S.name : sp.name; thing = sp.sprite; pitch = sp.pitch; }
+    if(thing){ cv.style.display = ''; paint(cv, thing, 72); } else cv.style.display = 'none';
+    nm.textContent = name || '';
+    if(onLine) onLine(L);
+    more.style.visibility = 'hidden';
+    await typeText(tx, fmt(L.t), pitch);
+    more.style.visibility = 'visible';
+    await onceTap();
+  }
+  ov.classList.remove('show');
+}
+async function boxSay(text, pitch=240){
+  const box = $('#box');
+  box.innerHTML = '<div class="narr"></div><div class="more">▼</div>';
+  const m = $('.more', box); m.style.visibility = 'hidden';
+  await typeText($('.narr', box), fmt(text), pitch, 20);
+  m.style.visibility = 'visible';
+  await onceTap();
+}
+async function boxFlash(html, ms=1100){ $('#box').innerHTML = `<div class="narr">${html}</div>`; await sleep(ms); }
+async function companionLine(L){ const sp = SPEAKERS[L.w]; await boxFlash(`<span class="who">${sp.name}:</span> ${esc(fmt(L.t))}`, 1500); }
+
+// Buttons: 'fast' uses pointerdown (instant, for battle). Otherwise click (so scrolling lists don't misfire).
+function bindTap(el, fn, fast=true){
+  const t0 = performance.now();
+  if(fast) el.addEventListener('pointerdown', e => { if(paused || performance.now() - t0 < 220) return; e.preventDefault(); fn(e); });
+  else el.addEventListener('click', e => { if(paused) return; fn(e); });
+}
+const setControls = html => { const c = $('#controls'); if(c) c.innerHTML = html; };
+
+let keyHandler = null; // whoever is listening for number keys right now
+window.addEventListener('keydown', e => {
+  if(!keyHandler || paused) return;
+  if(/^[0-9]$/.test(e.key)){ e.preventDefault(); keyHandler(e.key); }
+  else if(e.key === 'Backspace'){ e.preventDefault(); keyHandler('del'); }
+  else if(e.key === 'Enter'){ e.preventDefault(); keyHandler('ok'); }
+});
+function menu(items, sub=false){
+  return new Promise(res => {
+    let chosen = false;
+    const cols = sub ? `repeat(auto-fit,minmax(170px,1fr))` : `repeat(${items.length},1fr)`;
+    setControls(`<div class="menu ${sub?'sub':''}" style="grid-template-columns:${cols}">${items.map((it,i) => `<button class="mbtn ${it.cls||''}" data-i="${i}">${it.label}</button>`).join('')}</div>`);
+    const choose = i => { if(chosen) return; chosen = true; keyHandler = null; sfx.select(); res(items[i].value); };
+    $$('#controls .mbtn').forEach(b => bindTap(b, () => choose(+b.dataset.i)));
+    keyHandler = k => { const n = parseInt(k, 10); if(n >= 1 && n <= items.length) choose(n-1); };
+  });
+}
+function showKeypad(){
+  const keys = ['1','2','3','4','5','6','7','8','9','0','del','ok'];
+  setControls(`<div class="keypad">${keys.map(k => `<button class="key ${k}" data-k="${k}">${k==='del'?'⌫':k==='ok'?'✓':k}</button>`).join('')}</div>`);
+  $$('#controls .key').forEach(b => bindTap(b, () => keyHandler && keyHandler(b.dataset.k)));
+}
+// Read a typed number. Auto-submits once enough digits are typed.
+function readNumber(ansEl, answerLen, timerMs, tfill){
+  return new Promise(res => {
+    let buf = '', done = false, locked = false, tEnd = 0;
+    const t0 = gnow();
+    const finish = timedOut => { if(done) return; done = true; keyHandler = null; res({ value: buf === '' ? null : parseInt(buf, 10), ms: (tEnd || gnow()) - t0, timedOut }); };
+    const render = () => { ansEl.textContent = buf || '\u00a0'; };
+    keyHandler = k => {
+      if(done || locked) return;
+      if(k === 'del'){ buf = buf.slice(0, -1); sfx.tick(); }
+      else if(k === 'ok'){ if(buf !== ''){ tEnd = gnow(); finish(false); } return; }
+      else if(buf.length < 3){ buf += k; sfx.tick(); if(answerLen && buf.length >= answerLen){ tEnd = gnow(); locked = true; render(); setTimeout(() => finish(false), 130); return; } }
+      render();
+    };
+    if(timerMs && tfill){
+      const tick = () => {
+        if(done) return;
+        const el = gnow() - t0, f = Math.max(0, 1 - el/timerMs);
+        tfill.style.width = (f*100) + '%';
+        tfill.style.background = f < 0.25 ? '#ff4040' : f < 0.5 ? '#ffd23f' : '#3ce07a';
+        if(el >= timerMs && !locked){ finish(true); return; }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+    render();
+  });
+}
+
+/* ---------- 7. battle system ---------- */
+const maxHeroHp = () => 24 + 6*(S.level-1);
+const heroAtk = () => 6 + 2*(S.level-1);
+const xpNeed = l => 30 + 20*l;
+function gainXp(x){ S.xp += x; let ups = 0; while(S.xp >= xpNeed(S.level)){ S.xp -= xpNeed(S.level); S.level++; ups++; } return ups; }
+const timerMs = () => ({ chill:20000, normal:10000, spicy:6000 })[S.settings.speed] || 10000;
+const speedMult = () => ({ chill:1.5, normal:1, spicy:0.8 })[S.settings.speed] || 1;
+const fallTime = B => (6000 - 400*B.zi) * speedMult();
+const enemyZone = id => ZONES.findIndex(z => z.fights.includes(id));
+
+// Typed question (FIGHT / ACT). Wrong answers teach a strategy, then you type it once to lock it in.
+async function askTyped(q, title){
+  const box = $('#box');
+  box.innerHTML = `<div class="qwrap"><div class="qtitle">${title}</div><div class="qtext">${qHTML(q)}</div><div class="timer"><div class="tfill"></div></div><div class="qfb"></div></div>`;
+  showKeypad();
+  const ansEl = $('.ans', box), fb = $('.qfb', box);
+  const r = await readNumber(ansEl, String(q.answer).length, timerMs(), $('.tfill', box));
+  const correct = r.value === q.answer;
+  record(q.key, correct, r.ms);
+  if(correct){
+    ansEl.classList.add('right');
+    fb.innerHTML = `<span class="good">✓ ${(r.ms/1000).toFixed(1)}s</span>`;
+    await sleep(450);
+    return { correct:true, ms:r.ms };
+  }
+  sfx.wrong(); ansEl.classList.add('wrong');
+  fb.innerHTML = r.timedOut ? '<span class="bad">⏰ Out of time!</span>' : '<span class="bad">✗ Not quite!</span>';
+  await sleep(650);
+  box.innerHTML = `<div class="qwrap"><div class="qtitle bad">${r.timedOut ? 'Time’s up! Here’s the trick:' : 'Close! Here’s the trick:'}</div>
+    <div class="qtext fact">${q.full}</div><div class="hint">💡 ${hintFor(q)}</div>
+    <div class="qtitle small">Type it to lock it in:</div><div class="qtext entry">${qHTML(q)}</div></div>`;
+  const a2 = $('.ans', box);
+  for(;;){
+    const r2 = await readNumber(a2, String(q.answer).length, 0, null);
+    if(r2.value === q.answer) break;
+    sfx.wrong(); a2.classList.add('shake'); await sleep(320); a2.classList.remove('shake'); a2.textContent = '\u00a0';
+  }
+  a2.classList.add('right'); sfx.correct(); await sleep(400);
+  return { correct:false, ms:r.ms };
+}
+
+// Enemy turn: answer bubbles fall. Tap the right one before it hits the floor!
+function runOrbs(arena, q, B){
+  return new Promise(res => {
+    const W = arena.clientWidth, H = arena.clientHeight;
+    const size = Math.round(clamp(W/5.2, 62, 96));
+    arena.style.setProperty('--orb', size + 'px');
+    const opts = shuffle([q.answer, ...distractors(q)]);
+    const lanes = shuffle([0,1,2,3]), laneW = W/4;
+    const top = Math.round(Math.min(H*0.22, 70));
+    const dist = H - top, v = dist / fallTime(B);
+    const orbs = opts.map((val, i) => {
+      const el = document.createElement('button'); el.className = 'orb'; el.textContent = val;
+      const o = { el, val, gone:false, x: lanes[i]*laneW + (laneW-size)/2 + rand(-6,6), y: top - size - rand(0, Math.round(dist*0.45)) };
+      el.style.transform = `translate(${o.x}px,${o.y}px)`;
+      return o;
+    });
+    let done = false, last = gnow();
+    const end = r => { if(done) return; done = true; setTimeout(() => orbs.forEach(o => o.el.remove()), r === 'good' ? 250 : 650); res(r); };
+    orbs.forEach(o => {
+      o.el.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        if(done || paused || o.gone) return;
+        if(o.val === q.answer){ o.el.classList.add('good'); end('good'); }
+        else { o.el.classList.add('bad'); const c = orbs.find(z => z.val === q.answer); if(c) c.el.classList.add('reveal'); end('bad'); }
+      });
+      arena.appendChild(o.el);
+    });
+    const step = () => {
+      if(done) return;
+      const now = gnow(), dt = now - last; last = now;
+      for(const o of orbs){
+        if(o.gone) continue;
+        o.y += v*dt; o.el.style.transform = `translate(${o.x}px,${o.y}px)`;
+        if(o.y + size >= H){
+          if(o.val === q.answer){ o.el.classList.add('bad'); end('bad'); return; }
+          o.gone = true; o.el.classList.add('fizz');
+        }
+      }
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+async function dodgePhase(B, n){
+  const box = $('#box');
+  box.innerHTML = '<div class="arena"><div class="dq"></div><div class="floor"></div></div>';
+  setControls('<div class="hintline">Tap the RIGHT answer before it hits the floor!</div>');
+  const arena = $('.arena', box), dq = $('.dq', arena);
+  for(let i = 0; i < n && B.heroHp > 0; i++){
+    const q = genQ(B, Math.random() < 0.55 ? 'm' : 'd');
+    dq.textContent = q.prompt;
+    await sleep(250);
+    const t0 = gnow();
+    const r = await runOrbs(arena, q, B);
+    record(q.key, r === 'good', gnow() - t0);
+    const msg = document.createElement('div'); msg.className = 'amsg';
+    if(r === 'good'){ B.xp += 2; sfx.correct(); msg.innerHTML = '<span class="good">✓ DODGED!</span>'; arena.appendChild(msg); await sleep(550); }
+    else { hurtHero(B); msg.innerHTML = `<span class="bad">${q.full}</span>`; arena.appendChild(msg); await sleep(1500); }
+    msg.remove();
+  }
+}
+function hurtHero(B){
+  const dmg = B.edmg + rand(0,1);
+  B.heroHp = Math.max(0, B.heroHp - dmg); sfx.hurt();
+  const fl = $('#flash'); fl.style.opacity = '0.35'; setTimeout(() => fl.style.opacity = '0', 120);
+  const p = $('.party'); if(p){ p.classList.remove('hurt'); void p.offsetWidth; p.classList.add('hurt'); popNum($('.pcard'), '-' + dmg, ''); }
+  updParty(B);
+}
+function popNum(parent, text, cls){ if(!parent) return; const d = document.createElement('div'); d.className = 'dmg ' + cls; d.textContent = text; parent.appendChild(d); setTimeout(() => d.remove(), 1150); }
+function updEnemy(B){
+  const h = $('#ehp'), m = $('#emercy'), p = $('#emercyPct');
+  if(h) h.style.width = (100*B.hp/B.maxHp) + '%';
+  if(m) m.style.width = B.mercy + '%';
+  if(p) p.textContent = B.mercy + '%';
+}
+function updParty(B){
+  const h = $('#hhp'), t = $('#hhpTxt'), c = $('#combo');
+  if(h) h.style.width = (100*B.heroHp/B.heroMax) + '%';
+  if(t) t.textContent = `${B.heroHp}/${B.heroMax} HP`;
+  if(c) c.textContent = B.combo > 1 ? `COMBO ×${B.combo}` : '';
+}
+function renderBattle(B){
+  const E = B.E;
+  app.innerHTML = `<div id="battle" class="screen">
+    <button id="pauseBtn" class="pausebtn nopass" aria-label="Pause">❚❚</button>
+    <div class="enemyArea" id="enemyArea">
+      <div class="spriteWrap" id="eWrap"><canvas id="eCv"></canvas></div>
+      <div class="enemyInfo">
+        <div class="ename px">${E.name}</div>
+        <div class="barrow"><span class="lbl">HP</span><div class="bar"><div id="ehp" class="fill"></div></div></div>
+        <div class="barrow"><span class="lbl">MERCY</span><div class="bar mercybar"><div id="emercy" class="fill"></div></div><span id="emercyPct" class="pct">0%</span></div>
+      </div>
+    </div>
+    <div id="box" class="box"></div>
+    <div class="party">
+      <div class="pcard"><canvas id="pHero"></canvas><div class="pinfo">
+        <div class="pname">${esc(S.name)} <span class="lv">LV ${S.level}</span></div>
+        <div class="bar herobar"><div id="hhp" class="fill"></div></div>
+        <div class="hptxt"><span id="hhpTxt"></span><span id="combo" class="combo"></span></div></div></div>
+      <div class="pals"><div class="pal"><canvas id="pRemy"></canvas>REMY</div><div class="pal"><canvas id="pNull"></canvas>NULLBERT</div></div>
+    </div>
+    <div id="controls" class="controls"></div>
+  </div>`;
+  const sz = window.innerHeight < 720 ? 100 : 136;
+  paint($('#eCv'), E, E.final ? Math.round(sz*1.2) : sz);
+  paint($('#pHero'), 'hero', 48); paint($('#pRemy'), 'remy', 40); paint($('#pNull'), 'nullbert', 40);
+  $('#pauseBtn').addEventListener('pointerdown', e => { e.preventDefault(); doPause(); });
+  updEnemy(B); updParty(B);
+}
+function enemyHit(B, dmg, crit){
+  const w = $('#eWrap'); if(w){ w.classList.remove('hit'); void w.offsetWidth; w.classList.add('hit'); }
+  popNum($('#enemyArea'), (crit ? 'CRIT! ' : '') + dmg, crit ? 'crit' : '');
+  crit ? sfx.crit() : sfx.hit();
+  updEnemy(B);
+}
+
+async function startBattle(id){
+  const E = ENEMIES[id];
+  const zi = id === 'glitch' ? Math.min(4, Math.floor((S.level-1)/2)) : enemyZone(id);
+  const hp = E.final ? 180 : E.boss ? 60 + 18*zi : 30 + 12*zi;
+  const B = Object.assign({ E, zi, hp, maxHp:hp, mercy:0, snacks:2, combo:0, heroHp:maxHeroHp(), heroMax:maxHeroHp(), xp:0, recent:[],
+    edmg: 3 + 2*zi + (E.boss ? 1 : 0), dodgeN: zi === 0 ? 2 : 3, weak: id === 'glitch', phase2:false,
+    mercyGain: E.final ? 20 : E.boss ? 25 : 34 }, buildPools(E));
+  renderBattle(B);
+  music(E.boss ? 'boss' : 'battle');
+  if(!S.cleared[id] && E.pre) await say(E.pre, E);
+  else if(id === 'glitch' && !S.glitchWins) await say(E.pre, E);
+  await boxSay(E.intro);
+  let first = true;
+  for(;;){
+    // ----- player's turn -----
+    const box = $('#box');
+    box.innerHTML = '<div class="narr"></div>';
+    typeText($('.narr', box), first ? `* ${E.desc}` : `* ${E.name} ${pick(IDLE)}`, 240, 16);
+    first = false;
+    const action = await menu([
+      { label:'⚔ FIGHT', value:'fight' },
+      { label:'✦ ACT', value:'act' },
+      { label:`SNACK ×${B.snacks}`, value:'snack', cls: B.snacks ? '' : 'dim' },
+      { label:'♥ SPARE', value:'spare', cls: B.mercy >= 100 ? 'ready' : '' },
+    ]);
+    if(action === 'fight'){
+      const q = genQ(B, 'm');
+      const r = await askTyped(q, '⚔ FIGHT! Faster answers hit harder.');
+      if(r.correct){
+        B.combo++;
+        const crit = r.ms < 2500, good = r.ms < 5000;
+        const dmg = Math.round(heroAtk() * (crit ? 2 : good ? 1.4 : 1) * (1 + 0.1*Math.min(B.combo-1, 5))) + rand(0,2);
+        B.hp = Math.max(0, B.hp - dmg); B.xp += crit ? 6 : 4;
+        enemyHit(B, dmg, crit); updParty(B);
+        await boxFlash(`* ${crit ? '<span class="yellow">CRITICAL!</span> ' : ''}You dealt ${dmg} damage!${B.combo > 1 ? `  <span class="yellow">COMBO ×${B.combo}</span>` : ''}`, 1100);
+        if(crit && Math.random() < 0.35) await companionLine(pick(CRIT_LINES));
+      } else {
+        B.combo = 0; updParty(B);
+        await boxFlash('* Your attack missed!', 900);
+        if(Math.random() < 0.35) await companionLine(pick(MISS_LINES));
+      }
+      if(E.final && !B.phase2 && B.hp > 0 && B.hp <= B.maxHp/2){ B.phase2 = true; await say(E.phase2, E); }
+    }
+    else if(action === 'act'){
+      const choice = await menu([...E.acts.map((a,i) => ({ label:a.n, value:i })), { label:'🔍 Check', value:'check' }, { label:'← Back', value:'back' }], true);
+      if(choice === 'back') continue;
+      if(choice === 'check'){ await boxSay(`* ${E.name}\n* ${E.desc}\n* Focus: ${E.focus === 'weak' ? 'YOUR weak spots' : '× and ÷ by ' + E.focus.join(', ')}`); continue; }
+      const act = E.acts[choice];
+      if(act.joke){ await boxSay(act.t); }
+      else {
+        const q = genQ(B, 'd');
+        const r = await askTyped(q, `✦ ${act.n}! Solve it to make it land:`);
+        if(r.correct){
+          B.xp += 4; B.mercy = Math.min(100, B.mercy + B.mercyGain); updEnemy(B); sfx.mercy();
+          await boxSay(`${act.t}\n<MERCY +${B.mercyGain}%>`);
+          if(B.mercy >= 100) await boxFlash(`* <span class="yellow">${E.name} is ready to be SPARED!</span>`, 1400);
+        } else {
+          await boxSay(`* It did not quite land. ${E.name} looks confused.`);
+        }
+      }
+    }
+    else if(action === 'snack'){
+      if(B.snacks <= 0){ await boxFlash('* You are out of snacks!', 1000); continue; }
+      const amt = Math.min(B.heroMax - B.heroHp, Math.ceil(B.heroMax*0.6));
+      B.snacks--; B.heroHp += amt; sfx.heal(); popNum($('.pcard'), '+' + amt, 'heal'); updParty(B);
+      await boxSay(`* You ate ${pick(SNACKS)}.\n* Recovered ${amt} HP!`);
+    }
+    else if(action === 'spare'){
+      if(B.mercy >= 100) return winBattle(B, 'spare');
+      await boxFlash(`* ${E.name} is not ready to be spared.\n* Use ACT to fill the MERCY bar first!`, 1800);
+      continue;
+    }
+    if(B.hp <= 0) return winBattle(B, 'fight');
+
+    // ----- enemy's turn -----
+    setControls('');
+    await boxFlash(pick(E.quips), 1300);
+    await dodgePhase(B, B.dodgeN);
+    if(B.heroHp <= 0) return loseBattle(B);
+  }
+}
+
+async function winBattle(B, how){
+  const E = B.E;
+  music(null); setControls('');
+  if(how === 'fight'){ $('#eWrap').classList.add('dead'); sfx.win(); await boxSay(`* ${E.name} was defeated!`); }
+  else { sfx.mercy(); $('#eWrap').classList.add('spared'); await boxSay(E.spare); sfx.win(); }
+  const firstTime = !S.cleared[E.id];
+  const xp = B.xp + 20 + 5*B.zi + (how === 'spare' ? 10 : 0);
+  const ups = gainXp(xp);
+  if(E.id === 'glitch') S.glitchWins = (S.glitchWins || 0) + 1;
+  else S.cleared[E.id] = (S.cleared[E.id] === 'spare' || how === 'spare') ? 'spare' : 'fight';
+  S.totals.battles++; if(how === 'spare') S.totals.spared++;
+  save();
+  await boxSay(`* You won! You earned ${xp} XP.`);
+  if(ups){ sfx.levelup(); await boxSay(`* LEVEL UP! You are now LV ${S.level}!\n* Max HP +${6*ups}. Attack +${2*ups}.`); }
+  if(E.final) return ending(how);
+  if(E.win && (firstTime || E.id === 'glitch')) await say([E.win], E);
+  showMap();
+}
+async function loseBattle(B){
+  music(null); sfx.lose(); setControls('');
+  const xp = Math.floor(B.xp/2); const ups = gainXp(xp); save();
+  await boxSay('* You got DIVIDED BY ZERO.');
+  await boxSay(`* The result is... UNDEFINED.\n* (You still earned ${xp} XP for practicing.)`);
+  if(ups){ sfx.levelup(); await boxSay(`* ...and you LEVELED UP anyway! LV ${S.level}!`); }
+  await say([{w:'null',t:'That one is... technically my fault.'},{w:'remy',t:'Get up. Every fact you practiced still counts. Let’s go again.'}]);
+  const ch = await menu([{ label:'↻ TRY AGAIN', value:'retry' }, { label:'MAP', value:'map' }]);
+  if(ch === 'retry') startBattle(B.E.id); else showMap();
+}
+
+/* pause */
+function doPause(){ if(paused) return; paused = true; pauseStart = performance.now(); $('#pause').classList.add('show'); }
+function doResume(){ if(!paused) return; pausedTotal += performance.now() - pauseStart; paused = false; $('#pause').classList.remove('show'); }
+$('#resumeBtn').addEventListener('click', doResume);
+$('#quitBtn').addEventListener('click', () => { save(); try{ sessionStorage.setItem('tnp_goMap', '1'); }catch(e){} location.reload(); });
+
+/* ---------- 8. screens ---------- */
+function showTitle(){
+  music('map');
+  const has = !!S.name;
+  app.innerHTML = `<div class="screen title">
+    <div class="tsprites"><canvas id="tR"></canvas><canvas id="tH"></canvas><canvas id="tN"></canvas></div>
+    <h1 class="px logo">TIMES <span>&amp;</span><br>PUNISHMENT</h1>
+    <div class="tsub">a multiplication &amp; division RPG · facts 0–15</div>
+    <div class="tbtns" id="tbtns"></div>
+    <div class="tfoot">Sound on! (Check the iPad’s silent switch.)</div>
+  </div>`;
+  paint($('#tR'), 'remy', 96); paint($('#tH'), 'hero', 128); paint($('#tN'), 'nullbert', 96);
+  const nameForm = note => {
+    $('#tbtns').innerHTML = `<input id="nameIn" maxlength="12" placeholder="Type your name" autocomplete="off" value="${esc(S.name)}"><button class="btn big" id="start">START</button>${note ? `<div class="tfoot">${note}</div>` : ''}`;
+    const go = () => { const n = ($('#nameIn').value || '').trim().slice(0, 12) || 'Kid'; newGame(n); };
+    bindTap($('#start'), go, false);
+    $('#nameIn').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); go(); } });
+  };
+  if(has){
+    $('#tbtns').innerHTML = `<button class="btn big" id="cont">CONTINUE</button><div class="tfoot">${esc(S.name)} · LV ${S.level}</div><button class="btn" id="newg">NEW GAME</button>`;
+    bindTap($('#cont'), () => showMap(), false);
+    bindTap($('#newg'), () => nameForm('This restarts the story. The Fact Tracker keeps all your practice.'), false);
+  } else nameForm();
+}
+async function newGame(name){
+  Object.assign(S, { name, level:1, xp:0, cleared:{}, glitchWins:0, ending:null });
+  save();
+  await playIntro();
+  showMap();
+}
+async function playIntro(){
+  music(null);
+  app.innerHTML = `<div class="screen scene" id="scene"><div class="stage"><canvas id="scR" class="hidden"></canvas><canvas id="scH"></canvas><canvas id="scN" class="hidden"></canvas></div></div>`;
+  paint($('#scR'), 'remy', 112); paint($('#scH'), 'hero', 144); paint($('#scN'), 'nullbert', 112);
+  await say(INTRO, null, L => {
+    if(L.fx === 'glitch'){ const sc = $('#scene'); sc.classList.add('glitch'); sfx.hurt(); setTimeout(() => sc.classList.remove('glitch'), 950); }
+    if(L.show === 'remy') $('#scR').classList.remove('hidden');
+    if(L.show === 'nullbert'){ $('#scN').classList.remove('hidden'); music('map'); }
+  });
+}
+async function ending(how){
+  music('map');
+  app.innerHTML = `<div class="screen scene" id="scene"><div class="stage"><canvas id="scR"></canvas><canvas id="scH"></canvas><canvas id="scN"></canvas></div></div>`;
+  paint($('#scR'), 'remy', 112); paint($('#scH'), 'hero', 144); paint($('#scN'), 'nullbert', 112);
+  await say([...(how === 'spare' ? END_SPARE : END_FIGHT), ...END_COMMON], ENEMIES.divider);
+  S.ending = how; save();
+  const acc = S.totals.correct + S.totals.wrong ? Math.round(100*S.totals.correct/(S.totals.correct + S.totals.wrong)) : 0;
+  app.innerHTML = `<div class="screen"><div class="endcard">
+    <div class="px bigend">THE END</div>
+    <div class="tsub">${how === 'spare' ? '♥ The PEACEFUL ending. Nobody got divided.' : '⚔ The VICTORY ending. Gentle, educational victory.'}</div>
+    <div class="tsub">${S.totals.correct} facts answered right · ${acc}% accuracy · ${S.totals.spared} monster${S.totals.spared === 1 ? '' : 's'} spared</div>
+    <div class="tsub" style="color:#888">The Glitch Pit is still open, and any fight can be replayed. ${how === 'spare' ? 'What happens if you FIGHT the Divider?' : 'What happens if you SPARE the Divider?'}</div>
+    <button class="btn big" id="backMap">BACK TO THE NUMBERVERSE</button>
+  </div></div>`;
+  bindTap($('#backMap'), () => showMap(), false);
+}
+
+const isUnlocked = id => id === 'glitch' ? !!S.cleared.decapod : (ORDER.indexOf(id) === 0 || !!S.cleared[ORDER[ORDER.indexOf(id)-1]]);
+const nextFight = () => ORDER.find(id => !S.cleared[id]);
+function nodeHTML(id, nxt){
+  const E = ENEMIES[id], un = isUnlocked(id), c = S.cleared[id];
+  let st;
+  if(id === 'glitch') st = un ? (S.glitchWins ? `<span class="beaten">Beaten ×${S.glitchWins}</span>` : '<span class="new">ENTER</span>') : '🔒';
+  else st = c === 'spare' ? '<span class="spared">♥ SPARED</span>' : c === 'fight' ? '<span class="beaten">✓ BEATEN</span>' : un ? '<span class="new">NEW!</span>' : '🔒';
+  return `<button class="node ${un ? '' : 'locked'} ${id === nxt ? 'next' : ''} ${E.boss ? 'boss' : ''}" data-id="${id}"><canvas data-e="${id}"></canvas><div class="nname">${E.name}${E.boss ? ' 👑' : ''}</div><div class="nstat">${st}</div></button>`;
+}
+function showMap(){
+  music('map');
+  const nxt = nextFight();
+  const zones = ZONES.map((z, zi) => {
+    const any = z.fights.some(isUnlocked);
+    const focus = zi < 5 ? [...new Set(z.fights.flatMap(id => ENEMIES[id].focus))].sort((a,b) => a-b).join(' · ') : '2 – 15';
+    return `<div class="zone ${any ? '' : 'zlocked'}" style="--zc:${z.color}">
+      <div class="zhead"><div class="zname px">${zi < 5 ? `AREA ${zi+1}: ` : ''}${z.name}</div><div class="zfocus">× ÷ ${focus}</div></div>
+      <div class="zblurb">${z.blurb}</div><div class="nodes">${z.fights.map(id => nodeHTML(id, nxt)).join('')}</div></div>`;
+  }).join('');
+  const gUn = isUnlocked('glitch');
+  const glitch = `<div class="zone ${gUn ? '' : 'zlocked'}" style="--zc:#39ff14">
+      <div class="zhead"><div class="zname px">THE GLITCH PIT</div><div class="zfocus">your weak spots</div></div>
+      <div class="zblurb">${gUn ? 'Endless. Built from the facts you miss most. Perfect for a quick drill.' : 'Unlocks after Sir Decapod.'}</div>
+      <div class="nodes">${nodeHTML('glitch', null)}</div></div>`;
+  const need = xpNeed(S.level);
+  app.innerHTML = `<div class="screen map">
+    <div class="mapHead">
+      <div class="mlogo px">TIMES &amp; PUNISHMENT</div>
+      <div class="herochip"><canvas id="mHero"></canvas><div>${esc(S.name)} <span class="yellow">LV ${S.level}</span><div class="xpbar"><div style="width:${Math.round(100*S.xp/need)}%"></div></div></div></div>
+      <div class="hbtns"><button class="btn small" id="toStats">📊 TRACKER</button><button class="btn small" id="toSet">⚙</button></div>
+    </div>
+    <div class="scroll" id="mapScroll">${zones}${glitch}</div>
+    <div class="banter" id="banter"><canvas id="bCv"></canvas><div class="btext"><span class="bname" id="bName"></span> <span id="bText"></span></div></div>
+  </div>`;
+  paint($('#mHero'), 'hero', 40);
+  $$('canvas[data-e]').forEach(cv => paint(cv, ENEMIES[cv.dataset.e], 48));
+  $$('.node').forEach(n => bindTap(n, () => {
+    const id = n.dataset.id;
+    if(!isUnlocked(id)){ sfx.wrong(); n.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}], {duration:250}); return; }
+    sfx.select(); startBattle(id);
+  }, false));
+  bindTap($('#toStats'), () => showStats('m'), false);
+  bindTap($('#toSet'), () => showSettings(), false);
+  // scroll the next fight into view
+  const nx = $('.node.next'); if(nx) setTimeout(() => nx.scrollIntoView({ block:'center', behavior:'smooth' }), 60);
+  // companion banter: tap to hear more
+  let convo = pick(BANTER), li = 0;
+  const showB = () => {
+    const L = convo[li], sp = SPEAKERS[L.w];
+    paint($('#bCv'), sp.sprite, 48);
+    $('#bName').textContent = sp.name + ':';
+    typeText($('#bText'), fmt(L.t), sp.pitch, 22);
+  };
+  showB();
+  bindTap($('#banter'), () => { li++; if(li >= convo.length){ convo = pick(BANTER); li = 0; } showB(); }, false);
+}
+
+function factLabel(k){
+  const [t, rest] = k.split(':'), [x, y] = rest.split(',').map(Number);
+  return t === 'm' ? `${x} × ${y} = ${x*y}` : `${x*y} ÷ ${x} = ${y}`;
+}
+function gridHTML(tab){
+  let h = `<div class="grid"><div class="gh corner">${tab === 'm' ? '×' : '÷'}</div>`;
+  for(let c = 0; c <= 15; c++) h += `<div class="gh">${c}</div>`;
+  for(let r = (tab === 'm' ? 0 : 1); r <= 15; r++){
+    h += `<div class="gh">${r}</div>`;
+    for(let c = 0; c <= 15; c++){
+      const k = tab === 'm' ? factKeyM(r,c) : factKeyD(r,c);
+      const label = tab === 'm' ? `${r} × ${c} = ${r*c}` : `${r*c} ÷ ${r} = ${c}`;
+      h += `<button class="gc l${factLevel(k)}" data-k="${k}" data-label="${label}"></button>`;
+    }
+  }
+  return h + '</div>';
+}
+function showStats(tab){
+  let mM = 0, mD = 0, seen = 0;
+  for(let a = 0; a <= 15; a++) for(let b = a; b <= 15; b++) if(factLevel(factKeyM(a,b)) === 3) mM++;
+  for(let d = 1; d <= 15; d++) for(let q = 0; q <= 15; q++) if(factLevel(factKeyD(d,q)) === 3) mD++;
+  for(const k in S.stats) if(S.stats[k].n) seen++;
+  const T = S.totals, tot = T.correct + T.wrong;
+  const acc = tot ? Math.round(100*T.correct/tot) + '%' : '—';
+  const avg = T.tN ? (T.tSum/T.tN/1000).toFixed(1) + 's' : '—';
+  const weak = Object.entries(S.stats).filter(([k,s]) => s.n && factLevel(k) < 3)
+    .map(([k,s]) => [k, (s.n - s.c)/s.n + (s.lastWrong ? 0.6 : 0) + (s.t > 4000 ? 0.3 : 0) + (s.c === 0 ? 0.3 : 0)])
+    .filter(([,sc]) => sc > 0.2).sort((a,b) => b[1] - a[1]).slice(0, 12);
+  app.innerHTML = `<div class="screen stats">
+    <div class="shead"><button class="btn small" id="back">← MAP</button><div class="px title2">FACT TRACKER</div></div>
+    <div class="scroll">
+      <div class="summary">
+        <div class="sbox"><div class="n">${mM}/136</div><div class="l">× facts mastered</div></div>
+        <div class="sbox"><div class="n">${mD}/240</div><div class="l">÷ facts mastered</div></div>
+        <div class="sbox"><div class="n">${acc}</div><div class="l">accuracy (${tot} answers)</div></div>
+        <div class="sbox"><div class="n">${avg}</div><div class="l">average correct answer</div></div>
+      </div>
+      <div class="tabs"><button class="tab ${tab === 'm' ? 'on' : ''}" data-t="m">× TIMES</button><button class="tab ${tab === 'd' ? 'on' : ''}" data-t="d">÷ DIVIDE</button></div>
+      <div class="gridcap">${tab === 'm' ? 'Row × column. (7×8 and 8×7 count as one fact.)' : 'Row = what you divide by. Column = the answer.'}</div>
+      ${gridHTML(tab)}
+      <div class="cellinfo" id="cellInfo">Tap a square to see details.</div>
+      <div class="legend"><span><i class="l0"></i>not seen</span><span><i class="l1"></i>learning</span><span><i class="l2"></i>getting there</span><span><i class="l3"></i>mastered (3 in a row, under 3.5s)</span></div>
+      <h3>NEEDS WORK</h3>
+      <div class="weak">${weak.length ? weak.map(([k]) => `<span class="chip">${factLabel(k)}</span>`).join('') : '<span style="color:#888">Nothing yet. Go fight some monsters!</span>'}</div>
+      <div class="help" style="margin-top:18px">${seen} different facts practiced so far. The game picks facts weighted toward ones that were missed, slow, or never seen, and rests the mastered ones. The Glitch Pit drills only the weak spots.</div>
+    </div></div>`;
+  bindTap($('#back'), () => showMap(), false);
+  $$('.tab').forEach(t => bindTap(t, () => showStats(t.dataset.t), false));
+  $$('.gc').forEach(c => bindTap(c, () => {
+    $$('.gc.sel').forEach(x => x.classList.remove('sel')); c.classList.add('sel');
+    const s = S.stats[c.dataset.k];
+    $('#cellInfo').innerHTML = `<span class="yellow">${c.dataset.label}</span> — ` + (s && s.n ? `seen ${s.n}×, right ${s.c}×, ${s.streak} in a row${s.t ? `, avg ${(s.t/1000).toFixed(1)}s` : ''}` : 'not seen yet');
+  }, false));
+}
+function showSettings(){
+  const s = S.settings;
+  app.innerHTML = `<div class="screen settings">
+    <div class="shead"><button class="btn small" id="back">← MAP</button><div class="px title2">SETTINGS</div></div>
+    <div class="scroll">
+      <div class="srow"><label>Name</label><input id="nm" maxlength="12" value="${esc(S.name)}"></div>
+      <div class="srow"><label>Answer timer</label><div class="seg">${[['chill','Chill · 20s'],['normal','Normal · 10s'],['spicy','Spicy · 6s']].map(([k,l]) => `<button class="segb ${s.speed === k ? 'on' : ''}" data-speed="${k}">${l}</button>`).join('')}</div></div>
+      <div class="srow"><label>Sound effects</label><button class="segb ${s.sound ? 'on' : ''}" id="snd">${s.sound ? 'ON' : 'OFF'}</button></div>
+      <div class="srow"><label>Music</label><button class="segb ${s.music ? 'on' : ''}" id="mus">${s.music ? 'ON' : 'OFF'}</button></div>
+      <div class="help"><b>HOW TO PLAY</b><br>
+        <b>FIGHT</b> asks a multiplication fact. Type the answer. Under 2.5 seconds is a CRITICAL hit, and answers in a row build a COMBO.<br>
+        <b>ACT</b> asks a division fact (sometimes “7 × ? = 56”). Right answers fill the MERCY bar. At 100%, <b>SPARE</b> wins peacefully.<br>
+        <b>SNACK</b> heals. You get 2 per fight.<br>
+        When the monster attacks, answer bubbles fall. Tap the right one before it hits the floor!<br>
+        Miss a fact? You see a trick for it, then type the answer once to lock it in.</div>
+      <div class="help"><b>FOR PARENTS</b><br>
+        Covers every × and ÷ fact from 0 to 15. Each area focuses on a few numbers (the boss mixes them), and the final boss uses everything from 2 to 15.
+        Every answer is logged per fact with accuracy and speed. Questions are weighted toward facts that were missed, slow, or never seen, and mastered facts come up less.
+        “Mastered” means 3 right in a row with an average under about 3.5 seconds. The 📊 Tracker shows the full grid and a “needs work” list. Progress saves on this device.</div>
+      <div class="danger"><button class="btn" id="rstStats">RESET FACT TRACKER</button><button class="btn" id="rstAll">ERASE EVERYTHING</button></div>
+    </div></div>`;
+  bindTap($('#back'), () => { const n = ($('#nm').value || '').trim().slice(0, 12); if(n){ S.name = n; save(); } showMap(); }, false);
+  $$('[data-speed]').forEach(b => bindTap(b, () => { S.settings.speed = b.dataset.speed; save(); showSettings(); }, false));
+  bindTap($('#snd'), () => { S.settings.sound = !S.settings.sound; save(); showSettings(); }, false);
+  bindTap($('#mus'), () => { S.settings.music = !S.settings.music; save(); showSettings(); }, false);
+  const confirm2 = (el, fn) => { let armed = false; bindTap(el, () => { if(!armed){ armed = true; el.textContent = 'TAP AGAIN TO CONFIRM'; setTimeout(() => { armed = false; }, 4000); } else fn(); }, false); };
+  confirm2($('#rstStats'), () => { S.stats = {}; S.totals = defaultSave().totals; save(); showSettings(); });
+  confirm2($('#rstAll'), () => { const st = S.settings; S = defaultSave(); S.settings = st; save(); showTitle(); });
+}
+
+/* ---------- boot ---------- */
+(function boot(){
+  let goMap = false;
+  try{ goMap = sessionStorage.getItem('tnp_goMap') === '1'; sessionStorage.removeItem('tnp_goMap'); }catch(e){}
+  if(goMap && S.name) showMap(); else showTitle();
+})();
+</script>
+</body>
+</html>
